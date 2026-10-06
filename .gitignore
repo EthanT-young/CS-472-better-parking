@@ -2,18 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-.venv/
-venv/
-ENV/
-env/
-
 *.egg-info/
 dist/
 build/
-.pytest_cache/
-.mypy_cache/
-.uv/
+.env
+venv/
+.venv/
 
 # Dependencies
 **/node_modules/
