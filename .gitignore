@@ -5,9 +5,16 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-.env
-venv/
 .venv/
+
+# ML models
+*.pt
+*.pth
+*.onnx
+runs/
+datasets/
+wandb/
+
 
 # Dependencies
 **/node_modules/
@@ -17,6 +24,8 @@ venv/
 **/out/
 
 # Environment variables
+env/
+venv/
 .env
 .env.*
 !.env.example
