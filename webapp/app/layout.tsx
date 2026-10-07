@@ -11,9 +11,11 @@ export const metadata: Metadata = {
 export default function RootLayout({children, }: {children: React.ReactNode;})  {
   return (
     <html lang="en">
-      <body>
+      <body className="page-layout">
         <header>
-          <nav className="flex-no-wrap relative flex w-full items-center justify-between bg-zinc-50 py-4 shadow-dark-mild dark:bg-neutral-700 dark:text-white/75 lg:flex-wrap lg:justify-start lg:py-4" style={{ padding: "1rem" }}>
+          <h1 className="site-title"> UNLV Parking </h1>
+
+          <nav className="nav-bar" aria-label="Main navigation">
             <Link className = "nav-link" href = "/"> Home </Link> 
             <Link className = "nav-link" href = "/about"> About </Link>
             <Link className = "nav-link" href = "/faq"> FAQ </Link>
@@ -21,11 +23,11 @@ export default function RootLayout({children, }: {children: React.ReactNode;})  
           </nav>
         </header>
 
-        <main style={{ padding: "1rem" }}>
+        <main className="page-content">
           {children}
         </main>
 
-        <footer style={{ padding: "1rem", bottom: 'auto', backgroundColor: 'grey', textAlign: 'center', textDecorationColor: 'white'}}>
+        <footer className="site-footer">
           <p>Footer Placeholder</p>
         </footer>
       </body>
