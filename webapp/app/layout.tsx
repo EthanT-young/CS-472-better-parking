@@ -1,7 +1,9 @@
 import Link from "next/link"
-import "./globals.css";
-import { Metadata } from "next";
 import React from "react";
+import { Metadata } from "next";
+
+import "leaflet/dist/leaflet.css";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: 'UNLV Parking',
