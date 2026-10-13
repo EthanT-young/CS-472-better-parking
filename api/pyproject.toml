@@ -4,11 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
-    { name = "ethan-zhou-unlv", email = "zhoue2@unlv.nevada.edu" }
+    { name = "ethan-zhou-unlv", email = "zhoue2@unlv.nevada.edu" },
+    { name = "Jacob Minnich", email = "minnij1@unlv.nevada.edu" }
 ]
 requires-python = ">=3.9"
 dependencies = [
     "fastapi[standard]>=0.128.8",
+    "python-dotenv>=1.2.1",
+    "supabase>=2.32.0",
 ]
 
 [project.scripts]
