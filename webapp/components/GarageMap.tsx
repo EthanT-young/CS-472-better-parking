@@ -28,11 +28,21 @@ type FloorLayout = {
   spots: ParkingSpot[];
 };
 
+const floorBoundsCG: L.LatLngBoundsExpression = [
+    [0, 0],
+    [400, 600],
+];
+
+const floorBoundsT: L.LatLngBoundsExpression = [
+    [0, 0],
+    [500, 700],
+];
+
 const layouts: Record<string, Record<string, FloorLayout>> = {
   "garage-1": {
     "level-1": {
       name: "Cottage Grove — Level 1",
-      bounds: [[0, 0], [400, 600]],
+      bounds: floorBoundsCG,
       spots: [
         { id: "A1", bounds: [[100, 100], [220, 160]] },
         { id: "A2", bounds: [[100, 170], [220, 230]] },
@@ -41,7 +51,7 @@ const layouts: Record<string, Record<string, FloorLayout>> = {
     },
     "level-2": {
       name: "Cottage Grove — Level 2",
-      bounds: [[0, 0], [400, 600]],
+      bounds: floorBoundsCG,
       spots: [
         { id: "B1", bounds: [[200, 100], [320, 160]] },
         { id: "B2", bounds: [[200, 170], [320, 230]] },
@@ -49,10 +59,34 @@ const layouts: Record<string, Record<string, FloorLayout>> = {
     },
     "level-3": {
       name: "Cottage Grove — Level 3",
-      bounds: [[0, 0], [400, 600]],
+      bounds: floorBoundsCG,
       spots: [
         { id: "C1", bounds: [[100, 300], [220, 360]] },
         { id: "C2", bounds: [[100, 370], [220, 430]] },
+      ],
+    },
+    "level-4": {
+      name: "Cottage Grove — Level 4",
+      bounds: floorBoundsCG,
+      spots: [
+        { id: "D1", bounds: [[200, 100], [320, 160]] },
+        { id: "D2", bounds: [[200, 170], [320, 230]] },
+      ],
+    },
+    "level-5": {
+      name: "Cottage Grove — Level 5",
+      bounds: floorBoundsCG,
+      spots: [
+        { id: "E1", bounds: [[100, 300], [220, 360]] },
+        { id: "E2", bounds: [[100, 370], [220, 430]] },
+      ],
+    },
+    "level-6": {
+      name: "Cottage Grove — Level 6",
+      bounds: floorBoundsCG,
+      spots: [
+        { id: "F1", bounds: [[200, 100], [320, 160]] },
+        { id: "F2", bounds: [[200, 170], [320, 230]] },
       ],
     },
   },
@@ -60,27 +94,38 @@ const layouts: Record<string, Record<string, FloorLayout>> = {
   "garage-2": {
     "level-1": {
       name: "Tropicana — Level 1",
-      bounds: [[0, 0], [500, 700]],
+      bounds: floorBoundsT,
       spots: [
-        { id: "D1", bounds: [[150, 100], [270, 160]] },
-        { id: "D2", bounds: [[150, 170], [270, 230]] },
+        { id: "G1", bounds: [[150, 100], [270, 160]] },
+        { id: "G2", bounds: [[150, 170], [270, 230]] },
       ],
     },
     "level-2": {
-      name: "Tropicana— Level 2",
-      bounds: [[0, 0], [500, 700]],
+      name: "Tropicana — Level 2",
+      bounds: floorBoundsT,
       spots: [
-        { id: "E1", bounds: [[250, 300], [370, 360]] },
-        { id: "E2", bounds: [[250, 370], [370, 430]] },
+        { id: "H1", bounds: [[250, 300], [370, 360]] },
+        { id: "H2", bounds: [[250, 370], [370, 430]] },
+      ],
+    },
+    "level-3": {
+      name: "Tropicana — Level 3",
+      bounds: floorBoundsT,
+      spots: [
+        { id: "G1", bounds: [[150, 100], [270, 160]] },
+        { id: "G2", bounds: [[150, 170], [270, 230]] },
+      ],
+    },
+    "level-4": {
+      name: "Tropicana — Level 4",
+      bounds: floorBoundsT,
+      spots: [
+        { id: "H1", bounds: [[250, 300], [370, 360]] },
+        { id: "H2", bounds: [[250, 370], [370, 430]] },
       ],
     },
   },
 };
-
-const floorBounds: L.LatLngBoundsExpression = [
-    [0, 0],
-    [400, 600],
-];
 
 const spotColors: Record<Status, string> = {
     Available: "#2ba73e",
@@ -104,15 +149,11 @@ export default function GarageMap({garageId, levelId,}: GarageMapProps) {
         A1: "Available",
         A2: "Occupied",
         A3: "Available",
-        A4: "Occupied",
-    }); // Sample data 
+    }); // Sample data, setStatuses to be used when implementating live data
 
     if(!floor) {
         return <p>No layout is available for this garage and level.</p>;
     }
-
-    const availableCount = floor.spots.filter(
-        (spot) => statuses[spot.id] === "Available").length;
 
     return (
         <section>

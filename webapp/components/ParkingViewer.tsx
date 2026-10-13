@@ -1,5 +1,6 @@
 "use client";
 
+import OccupancyMonitor from "./OccupancyMonitor";
 import GarageMapLoader from "./GarageMapLoader";
 import { useState } from "react";
 
@@ -56,10 +57,15 @@ export default function ParkingViewer() {
                </div>
             </div>
 
-            <GarageMapLoader
-               key={`${garageId}:${levelId}`}
-               garageId={garageId}
-               levelId={levelId} />
+            <div className="parking-dashboard">
+               <div className="parking-map-panel">
+                  <GarageMapLoader
+                     key={`${garageId}:${levelId}`}
+                     garageId={garageId}
+                     levelId={levelId}/>
+               </div>
+               <OccupancyMonitor garageId={garageId} />
+            </div>
       </section>
    );
 }
