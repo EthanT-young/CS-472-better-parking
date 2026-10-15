@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { Status } from "../data/parking";
 
 const GarageMap = dynamic(() => import("./GarageMap"), {
    ssr:false,
@@ -10,6 +11,7 @@ const GarageMap = dynamic(() => import("./GarageMap"), {
 export type GarageMapProps = {
    garageId: string;
    levelId: string;
+   statuses: Record<string, Status>;
 };
 
 export default function GarageMapLoader(props: GarageMapProps) {

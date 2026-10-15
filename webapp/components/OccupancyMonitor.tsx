@@ -1,160 +1,101 @@
-type LevelOccupancy = {
-   id: string;
-   name: string;
-   total: number;
-   occupied: number;
-   unknown: number;
-};
-
-type GarageOccupancy = {
-   name: string;
-   levels: LevelOccupancy[];
-};
-
-const garageOccupancy: Record<string, GarageOccupancy> = {
-   "garage-1": {
-      name: "Cottage Grove",
-      levels: [
-         {
-            id: "level-1",
-            name: "Level 1",
-            total: 3,
-            occupied: 1,
-            unknown: 0,
-         },
-         {
-            id: "level-2",
-            name: "Level 2",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-3",
-            name: "Level 3",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-4",
-            name: "Level 4",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-5",
-            name: "Level 5",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-6",
-            name: "Level 6",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-      ],
-   },
-
-   "garage-2": {
-      name: "Tropicana",
-      levels: [
-         {
-            id: "level-1",
-            name: "Level 1",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-2",
-            name: "Level 2",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-3",
-            name: "Level 3",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-         {
-            id: "level-4",
-            name: "Level 4",
-            total: 2,
-            occupied: 0,
-            unknown: 2,
-         },
-      ],
-   },
-};
+import { garages, type Status } from "../data/parking"
 
 type OccupancyMonitorProps = {
-   garageId: string;
+  garageId: string;
+  statuses: Record<string, Status>;
 };
 
-export default function OccupancyMonitor({ garageId, }: OccupancyMonitorProps) {
-   const garage = garageOccupancy[garageId];
-
+export default function OccupancyMonitor({ garageId, statuses,}: OccupancyMonitorProps) {
+   const garage = garages.find((item) => item.id === garageId);
+   
    if (!garage) {
       return <p>No occupancy data available.</p>;
    }
+
+   const levels = garage.levels.map((floor) => {
+      const counts: Record<Status, number> = {
+         Available: 0,
+         Occupied: 0,
+         Unknown: 0,
+      };
+      
+      for (const stall of floor.stalls) {
+         counts[statuses[stall.id] ?? "Unknown"]++;
+      }
+
+      return {
+         id: floor.id,
+         name: floor.name,
+         total: floor.stalls.length,
+         ...counts,
+      };
+   });
 
    return (
       <aside className="occupancy-monitor" aria-label="Garage occupancy">
          <h2>{garage.name} Occupancy</h2>
          <p>Filled portion represents occupied spots.</p>
 
-         {garage.levels.map((level) => {
-            const available =
-               level.total - level.occupied - level.unknown;
-
+         {levels.map((level) => {
             const percent =
-               level.total > 0 ? Math.round((level.occupied / level.total) * 100) : 0;
+               level.total > 0 ? Math.round((level.Occupied / level.total) * 100) : 0;
 
-         const usageClass =
-            percent >= 90
-               ? "occupancy-high"
-               : percent >= 70
-               ? "occupancy-medium"
+            const hasKnownStatus =
+               level.Occupied + level.Available > 0;
+               
+            const showBar = level.total > 0 && hasKnownStatus;
+
+            const usageClass =
+               percent >= 90 ? "occupancy-high"
+               : percent >= 70 ? "occupancy-medium"
                : "occupancy-low";
 
-         return (
-            <section className="occupancy-level" key={level.id}>
-               <div className="occupancy-heading">
-                  <h3>{level.name}</h3>
-                  <span>
-                     {level.total > 0 ? `${percent}% occupied` : "No spots"}
-                  </span>
-               </div>
+            let occupancyLabel: string;
 
-               {level.total > 0 && (
-                  <progress
-                     className={`occupancy-bar ${usageClass}`}
-                     value={level.occupied}
-                     max={level.total}
-                     aria-label={`${level.name} occupancy`}
-                     aria-valuetext={
-                        `${level.occupied} of ${level.total} spots occupied`
-                     }/>
+            if (level.total === 0) {
+               occupancyLabel = "No Available Spots";
+            }
+            else if (!hasKnownStatus) {
+               occupancyLabel = "Occupancy Unknown";
+            }
+            else if (level.Unknown > 0) {
+               occupancyLabel = `${percent}% Confirmed Occupied`;
+            } 
+            else {
+               occupancyLabel = `${percent}% Occupied`;
+            }
+
+            return (
+               <section className="occupancy-level" key={level.id}>
+                  <div className="occupancy-heading">
+                     <h3>{level.name}</h3>
+                     <span>{occupancyLabel}</span>
+                  </div>
+
+                  {showBar && (
+                     <progress
+                        className={`occupancy-bar ${usageClass}`}
+                        value={level.Occupied}
+                        max={level.total}
+                        aria-label={`${level.name} occupancy`}
+                        aria-valuetext={
+                           `${level.Occupied} of ${level.total} usable spots occupied, ` +
+                           `${level.Available} available, ` +
+                           `${level.Unknown} unknown`
+                        }/>
                   )}
-               <p>
-                  {available} available · {level.occupied}/{level.total} occupied
-               </p>
-
-               {level.unknown > 0 && (
-                  <p className="occupancy-unknown">
-                     {level.unknown} spots have unknown status
+                  
+                  <p>
+                     {level.Available} Available · {" "} {level.Occupied}/{level.total} occupied
                   </p>
-               )}
-            </section>
-         );
+
+                  {level.Unknown > 0 && (
+                     <p className="occupancy-unknown">
+                        {level.Unknown} spots have an Unknown status
+                     </p>
+                  )}
+               </section>
+            );
          })}
       </aside>
    );

@@ -1,205 +1,102 @@
 "use client";
 
-import { useState } from "react";
 import L from "leaflet";
 import {
-    MapContainer,
-    ImageOverlay,
-    Rectangle,
-    Tooltip,
-    Popup,
+  MapContainer,
+  ImageOverlay,
+  Tooltip,
+  Polygon,
 } from "react-leaflet";
-import { GarageMapProps } from "./GarageMapLoader";
 
-type Status = "Available" | "Occupied" | "Unknown";
-type ParkingType = "student" | "accessibility" | "staff" | 
-    "electricVehicle" | "reserved" | "motorcycle" | "shortTerm"; 
-    // may not be implemented in first iteration of prototype; tentative
+import {garages, type Status } from "../data/parking";
+import type { GarageMapProps } from "./GarageMapLoader";
 
-type ParkingSpot = {
-    id: string;
-    bounds: L.LatLngBoundsExpression;
-};
-
-type FloorLayout = {
-  name: string;
-  imageUrl?: string;
-  bounds: L.LatLngBoundsExpression;
-  spots: ParkingSpot[];
-};
-
-const floorBoundsCG: L.LatLngBoundsExpression = [
-    [0, 0],
-    [400, 600],
-];
-
-const floorBoundsT: L.LatLngBoundsExpression = [
-    [0, 0],
-    [500, 700],
-];
-
-const layouts: Record<string, Record<string, FloorLayout>> = {
-  "garage-1": {
-    "level-1": {
-      name: "Cottage Grove — Level 1",
-      bounds: floorBoundsCG,
-      spots: [
-        { id: "A1", bounds: [[100, 100], [220, 160]] },
-        { id: "A2", bounds: [[100, 170], [220, 230]] },
-        { id: "A3", bounds: [[100, 240], [220, 300]] },
-      ],
-    },
-    "level-2": {
-      name: "Cottage Grove — Level 2",
-      bounds: floorBoundsCG,
-      spots: [
-        { id: "B1", bounds: [[200, 100], [320, 160]] },
-        { id: "B2", bounds: [[200, 170], [320, 230]] },
-      ],
-    },
-    "level-3": {
-      name: "Cottage Grove — Level 3",
-      bounds: floorBoundsCG,
-      spots: [
-        { id: "C1", bounds: [[100, 300], [220, 360]] },
-        { id: "C2", bounds: [[100, 370], [220, 430]] },
-      ],
-    },
-    "level-4": {
-      name: "Cottage Grove — Level 4",
-      bounds: floorBoundsCG,
-      spots: [
-        { id: "D1", bounds: [[200, 100], [320, 160]] },
-        { id: "D2", bounds: [[200, 170], [320, 230]] },
-      ],
-    },
-    "level-5": {
-      name: "Cottage Grove — Level 5",
-      bounds: floorBoundsCG,
-      spots: [
-        { id: "E1", bounds: [[100, 300], [220, 360]] },
-        { id: "E2", bounds: [[100, 370], [220, 430]] },
-      ],
-    },
-    "level-6": {
-      name: "Cottage Grove — Level 6",
-      bounds: floorBoundsCG,
-      spots: [
-        { id: "F1", bounds: [[200, 100], [320, 160]] },
-        { id: "F2", bounds: [[200, 170], [320, 230]] },
-      ],
-    },
-  },
-
-  "garage-2": {
-    "level-1": {
-      name: "Tropicana — Level 1",
-      bounds: floorBoundsT,
-      spots: [
-        { id: "G1", bounds: [[150, 100], [270, 160]] },
-        { id: "G2", bounds: [[150, 170], [270, 230]] },
-      ],
-    },
-    "level-2": {
-      name: "Tropicana — Level 2",
-      bounds: floorBoundsT,
-      spots: [
-        { id: "H1", bounds: [[250, 300], [370, 360]] },
-        { id: "H2", bounds: [[250, 370], [370, 430]] },
-      ],
-    },
-    "level-3": {
-      name: "Tropicana — Level 3",
-      bounds: floorBoundsT,
-      spots: [
-        { id: "G1", bounds: [[150, 100], [270, 160]] },
-        { id: "G2", bounds: [[150, 170], [270, 230]] },
-      ],
-    },
-    "level-4": {
-      name: "Tropicana — Level 4",
-      bounds: floorBoundsT,
-      spots: [
-        { id: "H1", bounds: [[250, 300], [370, 360]] },
-        { id: "H2", bounds: [[250, 370], [370, 430]] },
-      ],
-    },
-  },
-};
+// May not be implemented in first iteration of prototype
+// type ParkingType = "student" | "accessibility" | "staff" | 
+//   "electricVehicle" | "reserved" | "motorcycle" | "shortTerm"; 
 
 const spotColors: Record<Status, string> = {
-    Available: "#2ba73e",
-    Occupied: "#dd1111",
-    Unknown: "#857b7b",
+  Available: "#2ba73e",
+  Occupied: "#dd1111",
+  Unknown: "#857b7b",
 };
 
-const spotType: Record<ParkingType, string> ={
-    student: "#e9722d",
-    accessibility: "#51f4fc",
-    staff: "#fbf144",
-    electricVehicle: "#a844fb",
-    reserved: "#633737",
-    motorcycle: "#1e1c1b",
-    shortTerm: "#db5edf",
-} // may not be implemented in first iteration of prototype; tentative
+// May not be implemented in first iteration of prototype
+// const spotType: Record<ParkingType, string> ={
+//   student: "#e9722d",
+//   accessibility: "#51f4fc",
+//   staff: "#fbf144",
+//   electricVehicle: "#a844fb",
+//   reserved: "#633737",
+//   motorcycle: "#1e1c1b",
+//   shortTerm: "#db5edf",
+// }
 
-export default function GarageMap({garageId, levelId,}: GarageMapProps) {
-    const floor = layouts[garageId]?.[levelId];
-    const [statuses, setStatuses] = useState<Record<string, Status>>({
-        A1: "Available",
-        A2: "Occupied",
-        A3: "Available",
-    }); // Sample data, setStatuses to be used when implementating live data
+export default function GarageMap({garageId, levelId, statuses,}: GarageMapProps) {
+  const garage = garages.find((item) => item.id ===garageId);
+  const floor = garage?.levels.find((item) => item.id === levelId);
 
-    if(!floor) {
-        return <p>No layout is available for this garage and level.</p>;
-    }
+  if(!garage || !floor) {
+    return <p>No layout is available for this garage and level.</p>;
+  }
 
-    return (
-        <section>
-            <h2>{floor.name}</h2>
+  const [minX, minY, width, height] = garage.viewBox;
 
-            <MapContainer
-                key={`${garageId}:${levelId}`}
-                crs= {L.CRS.Simple} 
-                bounds= {floor.bounds}
-                minZoom= {-1.5}
-                maxZoom= {1.5}
-                style={{
-                    height: "500px",
-                    width: "100%",
-                    backgroundColor: "#e5e7eb",
-                }}>
-                
-                {floor.imageUrl && (
-                    <ImageOverlay url={floor.imageUrl} bounds={floor.bounds}/>
-                )}
-                    {floor.spots.map((spot) => {
-                        const status = statuses[spot.id] ?? "Unknown";
+  const bounds: L.LatLngBoundsExpression = [
+    [0, 0],
+    [height, width],
+  ];
 
-                    return(
-                        <Rectangle
-                            key= {spot.id}
-                            bounds= {spot.bounds}
-                            pathOptions= {{
-                                color: "#fff",
-                                weight: 2,
-                                fillColor: spotColors[status],
-                                fillOpacity: 0.25,
-                            }}>
-                            <Tooltip permanent direction= "center">
-                                {spot.id}
-                            </Tooltip>
+  function toMapPoint(point: number[]): L.LatLngTuple {
+    const [x, y] = point;
 
-                            <Popup>
-                                <strong>Spot {spot.id}</strong>
-                                <br />
-                                Status: {status}
-                            </Popup>
-                        </Rectangle>
-                    );
-                })}
-            </MapContainer>
-        </section>
-    );
+    return [
+      height - (y - minY),
+      x - minX,
+    ];
+  }
+
+  return (
+    <section>
+      <h2>{garage.name} - {floor.name}</h2>
+
+      <MapContainer
+        key={`${garageId}:${levelId}`}
+        crs= {L.CRS.Simple} 
+        bounds= {bounds}
+        boundsOptions={{ padding: [16, 16] }}
+        minZoom= {-1.5}
+        maxZoom= {1.5}
+        zoomSnap= {0.25}
+        style={{
+            height: "650px",
+            width: "100%",
+            backgroundColor: "#e5e7eb",
+        }}>
+            
+        <ImageOverlay url={floor.imageUrl} bounds={bounds} interactive={false}/>
+
+        {floor.stalls.map((stall) => {
+          const status = statuses[stall.id] ?? "Unknown";
+
+          return(
+            <Polygon
+              key= {stall.id}
+              positions={stall.points.map(toMapPoint)}
+              pathOptions= {{
+                color: spotColors[status],
+                weight: 1,
+                fillColor: spotColors[status],
+                fillOpacity: status === "Unknown" ? 0.12 : 0.65,
+              }}>
+
+              <Tooltip sticky>
+                {stall.type} : {status}
+              </Tooltip>
+            </Polygon> 
+          ); 
+        })}
+      </MapContainer>
+    </section>
+  );
 }

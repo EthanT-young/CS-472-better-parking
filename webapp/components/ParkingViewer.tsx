@@ -2,15 +2,21 @@
 
 import OccupancyMonitor from "./OccupancyMonitor";
 import GarageMapLoader from "./GarageMapLoader";
+import { garages, initialOccupancy } from "../data/parking";
 import { useState } from "react";
+// import { supabase } from '@/lib/supabaseClient';
 
 export default function ParkingViewer() {
    const [garageId, setGarageId] = useState(garages[0].id);
    const [levelId, setLevelId] = useState(garages[0].levels[0].id);
 
+   const [occupancy] = useState(initialOccupancy);
+
    const selectedGarage = garages.find(
       (garage) => garage.id === garageId
    )!;
+
+   const statuses = occupancy[garageId] ?? {};
 
    function changeGarage(nextGarageId: string) {
       const nextGarage = garages.find(
@@ -60,37 +66,14 @@ export default function ParkingViewer() {
             <div className="parking-dashboard">
                <div className="parking-map-panel">
                   <GarageMapLoader
-                     key={`${garageId}:${levelId}`}
                      garageId={garageId}
-                     levelId={levelId}/>
+                     levelId={levelId}
+                     statuses={statuses} />
                </div>
-               <OccupancyMonitor garageId={garageId} />
+               <OccupancyMonitor 
+                  garageId={garageId} 
+                  statuses={occupancy[garageId] ?? {}} />
             </div>
       </section>
    );
 }
-
-const garages = [
-  {
-    id: "garage-1",
-    name: "Cottage Grove",
-    levels: [
-      { id: "level-1", name: "Level 1" },
-      { id: "level-2", name: "Level 2" },
-      { id: "level-3", name: "Level 3" },
-      { id: "level-4", name: "Level 4" },
-      { id: "level-5", name: "Level 5" },
-      { id: "level-6", name: "Level 6" },
-    ],
-  },
-  {
-    id: "garage-2",
-    name: "Tropicana",
-    levels: [
-      { id: "level-1", name: "Level 1" },
-      { id: "level-2", name: "Level 2" },
-      { id: "level-3", name: "Level 3" },
-      { id: "level-4", name: "Level 4" },
-    ],
-  },
-];
