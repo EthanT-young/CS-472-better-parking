@@ -1,66 +1,75 @@
 import os
 from dotenv import load_dotenv
-from supabase import create_client, Client
-from supabase.client import ClientOptions
+import asyncio
+from supabase import acreate_client, AsyncClient
+from supabase.client import AsyncClientOptions
 
 load_dotenv()
 
-# initialize Supabase client
+# initialize supabase client
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(
-    url,
-    key,
-    options=ClientOptions(
-        schema="parking",
+async def create_supabase():
+    supabase: AsyncClient = await acreate_client(
+        url,
+        key,
+        options=AsyncClientOptions(
+            schema="parking",
+        )
     )
-)
+    return supabase
 
-# add seed data for tables in parking schema
-# site_id: 1 = Thomas and Mack
-# site_id: 2 = Cottage Grove
-# lot_id: 1 = Tropicana Parking Garage
-# lot_id: 2 = Cottage Grove Parking Garage
-def add_seed_data():
-    upsert_sites = (
-        supabase.table("sites")
-        .upsert([{"site_id": 1, "site_name": "Thomas and Mack"}, {"site_id": 2, "site_name": "Cottage Grove"}])
-        .execute()
-    )
-    upsert_lots = (
-        supabase.table("lots")
-        .upsert([{"lot_id": 1, "site_id": 1, "lot_name": "Tropicana Garage"},
-                 {"lot_id": 2, "site_id": 2, "lot_name": "Cottage Grove Parking Garage"}])
-        .execute()
-    )
-    upsert_floors = (
-        supabase.table("floors")
-        .upsert([{"lot_id": 1, "floor_num": 1},
-                 {"lot_id": 1, "floor_num": 2},
-                 {"lot_id": 1, "floor_num": 3},
-                 {"lot_id": 1, "floor_num": 4},
-                 {"lot_id": 2, "floor_num": 1},
-                 {"lot_id": 2, "floor_num": 2},
-                 {"lot_id": 2, "floor_num": 3},
-                 {"lot_id": 2, "floor_num": 4},
-                 {"lot_id": 2, "floor_num": 5},
-                 {"lot_id": 2, "floor_num": 6}])
-        .execute()
-    )
-    # a couple sections to get started
-    upsert_sections = (
-        supabase.table("sections")
-        .upsert([{"lot_id": 1, "floor_num": 1, "section_num": 1, "open_spaces": 0, "total_spaces": 10},
-                 {"lot_id": 1, "floor_num": 1, "section_num": 2, "open_spaces": 0, "total_spaces": 15},
-                 {"lot_id": 1, "floor_num": 2, "section_num": 1, "open_spaces": 0, "total_spaces": 20},
-                 {"lot_id": 1, "floor_num": 2, "section_num": 2, "open_spaces": 0, "total_spaces": 14},
-                 {"lot_id": 1, "floor_num": 2, "section_num": 3, "open_spaces": 0, "total_spaces": 8},
-                 {"lot_id": 2, "floor_num": 1, "section_num": 1, "open_spaces": 0, "total_spaces": 19}
-                 ])
-        .execute()
+# runs when a record is updated in supabase
+# prints the payload sent by supabase
+def handle_record_updated(payload):
+    print("record updated:", payload)
+
+
+# listens for updates in the sections table
+async def subscribe_to_sections():
+    supabase = await create_supabase()  # creates a supabase client
+    channel = supabase.channel("room1")
+
+    response = (
+        await channel
+        .on_postgres_changes("UPDATE", schema="parking", table="sections", callback=handle_record_updated)
+        .subscribe()
     )
 
-try:
-    add_seed_data()
-except Exception as err:
-    print(f"Adding seed data failed: {err}")
+    try:
+        # keep script running to listen for events
+        while True:
+            await asyncio.sleep(1)
+    finally:
+        # close supabase realtime
+        print("Closing supabase realtime connection...")
+        await supabase.remove_all_channels()
+
+        """
+        The following 5 lines were written by claude.
+            I gave it a copy of the file, and told it "This runs fine, but when I force terminate it, I get a bunch of 
+            errors". It gave me some code that looked like what I had above (I sent an outdated file without it), 
+            although at a glance, it didn't look correct.
+
+            Anyway, after that, I was more specific and said "I get 'Task was destroyed but it is pending!'. 
+            It then gave the code below, which worked.
+
+        Additionally, the code
+            except KeyboardInterrupt:
+                print("Closing program") 
+        towards the end of the file was also written by claude in the first query from above. This also worked.
+        """
+        # cancel any background tasks the realtime client left running
+        leftover = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+        for task in leftover:
+            task.cancel()
+        await asyncio.gather(*leftover, return_exceptions=True)
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(subscribe_to_sections())
+    except KeyboardInterrupt:
+        print("Closing program")
+    except Exception as err:
+        print(f"Adding seed data failed: {err}")
