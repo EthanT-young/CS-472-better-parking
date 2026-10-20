@@ -1,4 +1,3 @@
-// Types that match database diagram provided by Jacob
 export interface Site {
   site_id: number;
   site_name: string;
