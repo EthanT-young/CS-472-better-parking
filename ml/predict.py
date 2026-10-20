@@ -48,8 +48,17 @@ if __name__ == "__main__":
         default=[2, 3, 5, 7], 
         help="Class IDs to detect. Default: 2 3 5 7"
     )
+    
+    # Add bounding boxes for reference/training annotation
+    parser.add_argument("--visualize", action="store_true", help="Save an annotated image with bounding boxes")
+    parser.add_argument("--output", default="output.jpg", help="Where to save the visual output")
+    
     args = parser.parse_args()
     
     detector = ParkingDetector(args.model, vehicle_classes=args.classes)
-    count = detector.count_vehicles(args.image)
-    print(f"Vehicles detected: {count}")
+    
+    if args.visualize:
+        detector.visualize(args.image, output_path=args.output)
+    else:
+        count = detector.count_vehicles(args.image)
+        print(f"Vehicles detected: {count}")
