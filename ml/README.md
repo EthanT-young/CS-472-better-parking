@@ -21,6 +21,19 @@ python update.py
 
 ## Quick Start
 
+### Web GUI
+
+```bash
+cd ml/
+python gui.py          # then open http://127.0.0.1:8000
+```
+
+- **Predict**: type or browse to a folder in the sidebar, then click an image (or use the arrow keys) to run the model on it. Detections are drawn over the image. Change the model, confidence, and vehicle classes in the toolbar. *Save annotated* downloads the image with its boxes.
+- **Train**: same options as `train.py`. Output streams into the log, and *Stop* cancels the run.
+- **Test**: runs `test.py` against a dataset split and shows the mAP results in the log.
+
+Use `--port` to change the port. On WSL, open the URL in your Windows browser as usual. Use `--host 0.0.0.0` only on a trusted network, because the GUI can browse folders on this machine.
+
 ### Command Line
 
 ```bash

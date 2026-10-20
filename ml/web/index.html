@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parking Model</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Parking Model</h1>
+    <nav>
+      <button class="tab active" data-view="predict">Predict</button>
+      <button class="tab" data-view="train">Train</button>
+      <button class="tab" data-view="test">Test</button>
+    </nav>
+  </header>
+
+  <!-- Predict -->
+  <section id="view-predict" class="view active">
+    <aside class="sidebar">
+      <form id="path-form" class="path-row">
+        <button type="button" id="up-btn" title="Parent folder">↑</button>
+        <input id="path-input" spellcheck="false" placeholder="Folder path">
+        <button type="submit">Go</button>
+      </form>
+      <input id="filter-input" type="search" placeholder="Filter images…">
+      <ul id="file-list" class="file-list" tabindex="0"></ul>
+      <div id="file-count" class="muted">—</div>
+    </aside>
+
+    <main class="predict-main">
+      <div class="toolbar">
+        <label class="field grow">Model
+          <input id="model-input" list="model-options" spellcheck="false" value="models/parking_detector.pt">
+          <datalist id="model-options"></datalist>
+        </label>
+        <label class="field">Confidence <span id="conf-value">0.50</span>
+          <input id="conf-input" type="range" min="0.05" max="0.95" step="0.05" value="0.5">
+        </label>
+        <fieldset class="field classes">
+          <legend>Classes</legend>
+          <label><input type="checkbox" value="2" checked> Car</label>
+          <label><input type="checkbox" value="3" checked> Motorcycle</label>
+          <label><input type="checkbox" value="5" checked> Bus</label>
+          <label><input type="checkbox" value="7" checked> Truck</label>
+        </fieldset>
+        <div class="actions">
+          <button id="run-btn" class="primary">Run</button>
+          <label><input id="auto-input" type="checkbox" checked> Auto-run</label>
+          <label><input id="boxes-input" type="checkbox" checked> Boxes</label>
+          <button id="save-btn" disabled>Save annotated</button>
+        </div>
+      </div>
+
+      <div id="stage" class="stage">
+        <canvas id="canvas"></canvas>
+        <div id="stage-message" class="stage-message">Select an image from the sidebar.</div>
+      </div>
+
+      <div class="results">
+        <strong id="result-title">No image selected</strong>
+        <span id="result-detail" class="muted"></span>
+      </div>
+    </main>
+  </section>
+
+  <!-- Train -->
+  <section id="view-train" class="view job" data-job="train">
+    <form class="job-form">
+      <label>Dataset YAML <input name="data" value="data.yaml" spellcheck="false"></label>
+      <label>Base model <input name="base" value="yolov8n.pt" spellcheck="false" list="model-options"></label>
+      <label>Epochs <input name="epochs" type="number" min="1" value="50"></label>
+      <label>Batch size <input name="batch" type="number" min="1" value="16"></label>
+      <label>Image size <input name="imgsz" type="number" min="32" step="32" value="640"></label>
+      <div class="job-buttons">
+        <button type="submit" class="primary">Start training</button>
+        <button type="button" class="stop-btn" disabled>Stop</button>
+        <span class="job-status muted">Idle</span>
+      </div>
+    </form>
+    <pre class="log"></pre>
+  </section>
+
+  <!-- Test -->
+  <section id="view-test" class="view job" data-job="test">
+    <form class="job-form">
+      <label>Model weights <input name="model" value="runs/detect/train/weights/best.pt" spellcheck="false" list="model-options"></label>
+      <label>Dataset YAML <input name="data" value="data.yaml" spellcheck="false"></label>
+      <label>Split
+        <select name="split"><option>val</option><option>test</option></select>
+      </label>
+      <div class="job-buttons">
+        <button type="submit" class="primary">Run test</button>
+        <button type="button" class="stop-btn" disabled>Stop</button>
+        <span class="job-status muted">Idle</span>
+      </div>
+    </form>
+    <pre class="log"></pre>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
