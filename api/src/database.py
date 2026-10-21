@@ -26,8 +26,7 @@ def handle_record_updated(payload):
 
 
 # listens for updates in the sections table
-async def subscribe_to_sections():
-    supabase = await create_supabase()  # creates a supabase client
+async def subscribe_to_sections(supabase: AsyncClient):
     channel = supabase.channel("room1")
 
     response = (
@@ -68,7 +67,8 @@ async def subscribe_to_sections():
 
 if __name__ == "__main__":
     try:
-        asyncio.run(subscribe_to_sections())
+        sb = asyncio.run(create_supabase()) # create supabase client
+        asyncio.run(subscribe_to_sections(sb))
     except KeyboardInterrupt:
         print("Closing program")
     except Exception as err:
