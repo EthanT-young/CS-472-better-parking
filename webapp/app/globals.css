@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1f5f9;
+  --foreground: #0f172a;
 }
 
 @theme inline {
@@ -12,15 +12,96 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Stall map: mute the floor plan's zone colors so only open / taken stand out. */
+.stall-map {
+  background: #f8fafc;
+}
+
+.stall-map-floorplan {
+  filter: grayscale(1) opacity(0.45);
+}
+
+.stall-map-hc .stall-map {
+  background: #ffffff;
+}
+
+.stall-map-hc .stall-map-floorplan {
+  filter: grayscale(1) contrast(1.6) opacity(0.6);
+}
+
+.stall-swatch-taken {
+  background: repeating-linear-gradient(45deg, #64748b 0 3px, #e2e8f0 3px 4.5px);
+}
+
+.stall-swatch-taken-hc {
+  background: repeating-linear-gradient(45deg, #000 0 3px, #fff 3px 4.5px);
+}
+
+/* Campus map pins (Leaflet divIcons). */
+.campus-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  border: 2px solid #0f172a;
+  background: #fff;
+  color: #0f172a;
+  font: 600 12px/1 var(--font-geist-sans), Arial, sans-serif;
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.3);
+  cursor: pointer;
+}
+
+.campus-pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #0f172a;
+  border-bottom: 0;
+}
+
+.campus-pin-count {
+  min-width: 28px;
+  padding: 5px 6px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 800;
+  color: #fff;
+}
+
+.campus-pin-good .campus-pin-count { background: #047857; }
+.campus-pin-warn .campus-pin-count { background: #b45309; }
+.campus-pin-bad .campus-pin-count { background: #b91c1c; }
+.campus-pin-none .campus-pin-count { background: #64748b; }
+
+.campus-pin-selected {
+  border-color: #dc2626;
+  outline: 3px solid rgb(220 38 38 / 0.3);
+  z-index: 1;
+}
+
+/* High contrast mode: stronger borders and text everywhere. */
+.high-contrast {
+  background: #fff;
+}
+
+.high-contrast .text-slate-500,
+.high-contrast .text-slate-600 {
+  color: #000;
+}
+
+.high-contrast .border-slate-200 {
+  border-color: #000;
 }

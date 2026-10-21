@@ -1,0 +1,492 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 1130" width="910" height="1130" data-level="4" class="garage-level garage-level-4" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTowMDAwNTVhMC0wMTM3LTQ4NTMtYTFhNS0yMGIxNDhhNGM0NWEAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaKgSEG/7vMAG/FEFYBHHWnkAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDoxOTgwN2MyZi1kZmFlLTRlMDgtOThlMi00MzMxYjEwMWVmY2FscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNox9vb4u4ndYryS9MfexR+RgAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgg8me+SeJ/2cLB9v3l3voA3k4Qw3PBjrr+8HwySvG65jakZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaFuwY0DJQoOfmGYt2FKQK4EAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCDZv/6qMcwCoiPpJLSWpqMgq9Pi1PH9eGG1EWhHGU+uzWRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBjLZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjAwMDA1NWEwLTAxMzctNDg1My1hMWE1LTIwYjE0OGE0YzQ1YS9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmM0ZGQ0ZTQyLTI3Y2ItNDRiMS1iMTdmLWVmZWUxMjNmMGY3NXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDyZ75J4n/ZwsH2/eXe+gDeThDDc8GOuv7wfDJK8brmNqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFgg+75utma3m42OqwgsPpBZysyBTxidU6RuhyuELTlP4faiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggs+1rmbeqQ2XkmQM1cetlXcboGxEDHfTbXJ8pf0DUyx50Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQD12/PyVIDxvyzK3Fkwj52++hFGgA7H3ySkeZ5d51tFCid5ouMt2FYAaYPE/NlJwu1m9GupBzrMtwK9zMTadmWA=</c2pa:manifest></metadata>
+<title>Cottage Grove Parking Garage - Level 4</title>
+<defs><marker id="ah-L4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#111"/></marker></defs>
+<g id="L4-features" class="features">
+<rect id="L4-ramp-down-west" class="ramp" data-feature="ramp" x="130" y="172" width="54" height="385" fill="#cfd8ff" fill-opacity="0.45" stroke="#5a6fd6" stroke-width="1.5" stroke-dasharray="6 4"/>
+<rect id="L4-ramp-down-east" class="ramp" data-feature="ramp" x="729" y="172" width="52" height="384" fill="#cfd8ff" fill-opacity="0.45" stroke="#5a6fd6" stroke-width="1.5" stroke-dasharray="6 4"/>
+<rect id="L4-ramp-up-west" class="ramp" data-feature="ramp" x="130" y="565" width="54" height="385" fill="#cfd8ff" fill-opacity="0.45" stroke="#5a6fd6" stroke-width="1.5" stroke-dasharray="6 4"/>
+<rect id="L4-ramp-up-east" class="ramp" data-feature="ramp" x="729" y="564" width="52" height="392" fill="#cfd8ff" fill-opacity="0.45" stroke="#5a6fd6" stroke-width="1.5" stroke-dasharray="6 4"/>
+</g>
+<g id="L4-stalls" class="stalls" stroke="#3c4043" stroke-width="1" fill-opacity="0.35">
+<polygon id="L4-TW-01" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="143,109 165.6,109 165.6,64 143,64"/>
+<polygon id="L4-TW-02" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="165.6,109 188.2,109 188.2,64 165.6,64"/>
+<polygon id="L4-TW-03" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="188.2,109 210.8,109 210.8,64 188.2,64"/>
+<polygon id="L4-TW-04" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="210.8,109 233.4,109 233.4,64 210.8,64"/>
+<polygon id="L4-TW-05" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="233.4,109 255.9,109 255.9,64 233.4,64"/>
+<polygon id="L4-TW-06" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="255.9,109 278.5,109 278.5,64 255.9,64"/>
+<polygon id="L4-TW-07" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="278.5,109 301.1,109 301.1,64 278.5,64"/>
+<polygon id="L4-TW-08" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="301.1,109 323.7,109 323.7,64 301.1,64"/>
+<polygon id="L4-TW-09" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="323.7,109 346.3,109 346.3,64 323.7,64"/>
+<polygon id="L4-TW-10" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="346.3,109 368.9,109 368.9,64 346.3,64"/>
+<polygon id="L4-TW-11" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="368.9,109 391.5,109 391.5,64 368.9,64"/>
+<polygon id="L4-TW-12" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="391.5,109 414.1,109 414.1,64 391.5,64"/>
+<polygon id="L4-TW-13" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="414.1,109 436.6,109 436.6,64 414.1,64"/>
+<polygon id="L4-TW-14" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="436.6,109 459.2,109 459.2,64 436.6,64"/>
+<polygon id="L4-TW-15" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="459.2,109 481.8,109 481.8,64 459.2,64"/>
+<polygon id="L4-TW-16" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="481.8,109 504.4,109 504.4,64 481.8,64"/>
+<polygon id="L4-TW-17" class="stall stall-student zone-standard" data-strip="TW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="504.4,109 527,109 527,64 504.4,64"/>
+<polygon id="L4-TE-01" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="535,109 556.1,109 556.1,64 535,64"/>
+<polygon id="L4-TE-02" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="556.1,109 577.2,109 577.2,64 556.1,64"/>
+<polygon id="L4-TE-03" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="577.2,109 598.3,109 598.3,64 577.2,64"/>
+<polygon id="L4-TE-04" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="598.3,109 619.4,109 619.4,64 598.3,64"/>
+<polygon id="L4-TE-05" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="619.4,109 640.5,109 640.5,64 619.4,64"/>
+<polygon id="L4-TE-06" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="640.5,109 661.5,109 661.5,64 640.5,64"/>
+<polygon id="L4-TE-07" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="661.5,109 682.6,109 682.6,64 661.5,64"/>
+<polygon id="L4-TE-08" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="682.6,109 703.7,109 703.7,64 682.6,64"/>
+<polygon id="L4-TE-09" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="703.7,109 724.8,109 724.8,64 703.7,64"/>
+<polygon id="L4-TE-10" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="724.8,109 745.9,109 745.9,64 724.8,64"/>
+<polygon id="L4-TE-11" class="stall stall-student zone-standard" data-strip="TE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="745.9,109 767,109 767,64 745.9,64"/>
+<polygon id="L4-LO-01" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,106 129,128.6 85,128.6 85,106"/>
+<polygon id="L4-LO-02" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,128.6 129,151.1 85,151.1 85,128.6"/>
+<polygon id="L4-LO-03" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,151.1 129,173.7 85,173.7 85,151.1"/>
+<polygon id="L4-LO-04" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,173.7 129,196.2 85,196.2 85,173.7"/>
+<polygon id="L4-LO-05" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,196.2 129,218.8 85,218.8 85,196.2"/>
+<polygon id="L4-LO-06" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,218.8 129,241.3 85,241.3 85,218.8"/>
+<polygon id="L4-LO-07" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,241.3 129,263.9 85,263.9 85,241.3"/>
+<polygon id="L4-LO-08" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,263.9 129,286.4 85,286.4 85,263.9"/>
+<polygon id="L4-LO-09" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,286.4 129,309 85,309 85,286.4"/>
+<polygon id="L4-LO-10" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,309 129,331.5 85,331.5 85,309"/>
+<polygon id="L4-LO-11" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,331.5 129,354.1 85,354.1 85,331.5"/>
+<polygon id="L4-LO-12" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,354.1 129,376.6 85,376.6 85,354.1"/>
+<polygon id="L4-LO-13" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,376.6 129,399.2 85,399.2 85,376.6"/>
+<polygon id="L4-LO-14" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,399.2 129,421.7 85,421.7 85,399.2"/>
+<polygon id="L4-LO-15" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,421.7 129,444.2 85,444.2 85,421.7"/>
+<polygon id="L4-LO-16" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,444.2 129,466.8 85,466.8 85,444.2"/>
+<polygon id="L4-LO-17" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,466.8 129,489.4 85,489.4 85,466.8"/>
+<polygon id="L4-LO-18" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,489.4 129,511.9 85,511.9 85,489.4"/>
+<polygon id="L4-LO-19" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,511.9 129,534.5 85,534.5 85,511.9"/>
+<polygon id="L4-LO-20" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,534.5 129,557 85,557 85,534.5"/>
+<polygon id="L4-LO-21" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,566 129,587.5 85,587.5 85,566"/>
+<polygon id="L4-LO-22" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,587.5 129,609 85,609 85,587.5"/>
+<polygon id="L4-LO-23" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,609 129,630.6 85,630.6 85,609"/>
+<polygon id="L4-LO-24" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,630.6 129,652.1 85,652.1 85,630.6"/>
+<polygon id="L4-LO-25" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,652.1 129,673.6 85,673.6 85,652.1"/>
+<polygon id="L4-LO-26" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,673.6 129,695.1 85,695.1 85,673.6"/>
+<polygon id="L4-LO-27" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,695.1 129,716.7 85,716.7 85,695.1"/>
+<polygon id="L4-LO-28" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,716.7 129,738.2 85,738.2 85,716.7"/>
+<polygon id="L4-LO-29" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,738.2 129,759.7 85,759.7 85,738.2"/>
+<polygon id="L4-LO-30" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,759.7 129,781.2 85,781.2 85,759.7"/>
+<polygon id="L4-LO-31" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,781.2 129,802.8 85,802.8 85,781.2"/>
+<polygon id="L4-LO-32" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,802.8 129,824.3 85,824.3 85,802.8"/>
+<polygon id="L4-LO-33" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,824.3 129,845.8 85,845.8 85,824.3"/>
+<polygon id="L4-LO-34" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,845.8 129,867.3 85,867.3 85,845.8"/>
+<polygon id="L4-LO-35" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,867.3 129,888.9 85,888.9 85,867.3"/>
+<polygon id="L4-LO-36" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,888.9 129,910.4 85,910.4 85,888.9"/>
+<polygon id="L4-LO-37" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,910.4 129,931.9 85,931.9 85,910.4"/>
+<polygon id="L4-LO-38" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,931.9 129,953.4 85,953.4 85,931.9"/>
+<polygon id="L4-LO-39" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,953.4 129,975 85,975 85,953.4"/>
+<polygon id="L4-LO-40" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,975 129,996.5 85,996.5 85,975"/>
+<polygon id="L4-LO-41" class="stall stall-student zone-standard" data-strip="LO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="129,996.5 129,1018 85,1018 85,996.5"/>
+<polygon id="L4-A-01" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,168 185,189.6 230,189.6 230,168"/>
+<polygon id="L4-A-02" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,189.6 185,211.2 230,211.2 230,189.6"/>
+<polygon id="L4-A-03" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,211.2 185,232.8 230,232.8 230,211.2"/>
+<polygon id="L4-A-04" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,232.8 185,254.4 230,254.4 230,232.8"/>
+<polygon id="L4-A-05" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,254.4 185,276.1 230,276.1 230,254.4"/>
+<polygon id="L4-A-06" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,276.1 185,297.7 230,297.7 230,276.1"/>
+<polygon id="L4-A-07" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,297.7 185,319.3 230,319.3 230,297.7"/>
+<polygon id="L4-A-08" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,319.3 185,340.9 230,340.9 230,319.3"/>
+<polygon id="L4-A-09" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,340.9 185,362.5 230,362.5 230,340.9"/>
+<polygon id="L4-A-10" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,362.5 185,384.1 230,384.1 230,362.5"/>
+<polygon id="L4-A-11" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,384.1 185,405.7 230,405.7 230,384.1"/>
+<polygon id="L4-A-12" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,405.7 185,427.3 230,427.3 230,405.7"/>
+<polygon id="L4-A-13" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,427.3 185,448.9 230,448.9 230,427.3"/>
+<polygon id="L4-A-14" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,448.9 185,470.6 230,470.6 230,448.9"/>
+<polygon id="L4-A-15" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,470.6 185,492.2 230,492.2 230,470.6"/>
+<polygon id="L4-A-16" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,492.2 185,513.8 230,513.8 230,492.2"/>
+<polygon id="L4-A-17" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,513.8 185,535.4 230,535.4 230,513.8"/>
+<polygon id="L4-A-18" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,535.4 185,557 230,557 230,535.4"/>
+<polygon id="L4-A-19" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,567 185,589.5 230,589.5 230,567"/>
+<polygon id="L4-A-20" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,589.5 185,612.1 230,612.1 230,589.5"/>
+<polygon id="L4-A-21" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,612.1 185,634.6 230,634.6 230,612.1"/>
+<polygon id="L4-A-22" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,634.6 185,657.1 230,657.1 230,634.6"/>
+<polygon id="L4-A-23" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,657.1 185,679.6 230,679.6 230,657.1"/>
+<polygon id="L4-A-24" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,679.6 185,702.2 230,702.2 230,679.6"/>
+<polygon id="L4-A-25" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,702.2 185,724.7 230,724.7 230,702.2"/>
+<polygon id="L4-A-26" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,724.7 185,747.2 230,747.2 230,724.7"/>
+<polygon id="L4-A-27" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,747.2 185,769.8 230,769.8 230,747.2"/>
+<polygon id="L4-A-28" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,769.8 185,792.3 230,792.3 230,769.8"/>
+<polygon id="L4-A-29" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,792.3 185,814.8 230,814.8 230,792.3"/>
+<polygon id="L4-A-30" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,814.8 185,837.4 230,837.4 230,814.8"/>
+<polygon id="L4-A-31" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,837.4 185,859.9 230,859.9 230,837.4"/>
+<polygon id="L4-A-32" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,859.9 185,882.4 230,882.4 230,859.9"/>
+<polygon id="L4-A-33" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,882.4 185,904.9 230,904.9 230,882.4"/>
+<polygon id="L4-A-34" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,904.9 185,927.5 230,927.5 230,904.9"/>
+<polygon id="L4-A-35" class="stall stall-student zone-standard" data-strip="A" data-type="Student" data-zone="standard" fill="#9aa0a6" points="185,927.5 185,950 230,950 230,927.5"/>
+<polygon id="L4-B-01" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,176 281,201.3 236,226.7 236,201.4"/>
+<polygon id="L4-B-02" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,201.3 281,226.6 236,252 236,226.7"/>
+<polygon id="L4-B-03" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,226.6 281,251.9 236,277.3 236,252"/>
+<polygon id="L4-B-04" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,251.9 281,277.1 236,302.5 236,277.3"/>
+<polygon id="L4-B-05" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,277.1 281,302.4 236,327.8 236,302.5"/>
+<polygon id="L4-B-06" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,302.4 281,327.7 236,353.1 236,327.8"/>
+<polygon id="L4-B-07" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,327.7 281,353 236,378.4 236,353.1"/>
+<polygon id="L4-B-08" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,353 281,378.3 236,403.7 236,378.4"/>
+<polygon id="L4-B-09" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,378.3 281,403.6 236,429 236,403.7"/>
+<polygon id="L4-B-10" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,403.6 281,428.9 236,454.3 236,429"/>
+<polygon id="L4-B-11" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,428.9 281,454.1 236,479.5 236,454.3"/>
+<polygon id="L4-B-12" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,454.1 281,479.4 236,504.8 236,479.5"/>
+<polygon id="L4-B-13" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,479.4 281,504.7 236,530.1 236,504.8"/>
+<polygon id="L4-B-14" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,504.7 281,530 236,555.4 236,530.1"/>
+<polygon id="L4-B-15" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,560 281,585.9 236,611.3 236,585.4"/>
+<polygon id="L4-B-16" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,585.9 281,611.7 236,637.1 236,611.3"/>
+<polygon id="L4-B-17" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,611.7 281,637.6 236,663 236,637.1"/>
+<polygon id="L4-B-18" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,637.6 281,663.4 236,688.8 236,663"/>
+<polygon id="L4-B-19" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,663.4 281,689.3 236,714.7 236,688.8"/>
+<polygon id="L4-B-20" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,689.3 281,715.1 236,740.5 236,714.7"/>
+<polygon id="L4-B-21" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,715.1 281,741 236,766.4 236,740.5"/>
+<polygon id="L4-B-22" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,741 281,766.9 236,792.3 236,766.4"/>
+<polygon id="L4-B-23" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,766.9 281,792.7 236,818.1 236,792.3"/>
+<polygon id="L4-B-24" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,792.7 281,818.6 236,844 236,818.1"/>
+<polygon id="L4-B-25" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,818.6 281,844.4 236,869.8 236,844"/>
+<polygon id="L4-B-26" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,844.4 281,870.3 236,895.7 236,869.8"/>
+<polygon id="L4-B-27" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,870.3 281,896.1 236,921.5 236,895.7"/>
+<polygon id="L4-B-28" class="stall stall-student zone-standard" data-strip="B" data-type="Student" data-zone="standard" fill="#9aa0a6" points="281,896.1 281,922 236,947.4 236,921.5"/>
+<polygon id="L4-C-01" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,160 333,185.3 379,210.7 379,185.4"/>
+<polygon id="L4-C-02" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,185.3 333,210.6 379,236 379,210.7"/>
+<polygon id="L4-C-03" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,210.6 333,236 379,261.4 379,236"/>
+<polygon id="L4-C-04" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,236 333,261.3 379,286.7 379,261.4"/>
+<polygon id="L4-C-05" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,261.3 333,286.6 379,312 379,286.7"/>
+<polygon id="L4-C-06" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,286.6 333,311.9 379,337.3 379,312"/>
+<polygon id="L4-C-07" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,311.9 333,337.3 379,362.7 379,337.3"/>
+<polygon id="L4-C-08" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,337.3 333,362.6 379,388 379,362.7"/>
+<polygon id="L4-C-09" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,362.6 333,387.9 379,413.3 379,388"/>
+<polygon id="L4-C-10" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,387.9 333,413.2 379,438.6 379,413.3"/>
+<polygon id="L4-C-11" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,413.2 333,438.5 379,464 379,438.6"/>
+<polygon id="L4-C-12" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,438.5 333,463.9 379,489.3 379,464"/>
+<polygon id="L4-C-13" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,463.9 333,489.2 379,514.6 379,489.3"/>
+<polygon id="L4-C-14" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,489.2 333,514.5 379,539.9 379,514.6"/>
+<polygon id="L4-C-15" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,514.5 333,539.8 379,565.2 379,539.9"/>
+<polygon id="L4-C-16" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,539.8 333,565.2 379,590.6 379,565.2"/>
+<polygon id="L4-C-17" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,565.2 333,590.5 379,615.9 379,590.6"/>
+<polygon id="L4-C-18" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,590.5 333,615.8 379,641.2 379,615.9"/>
+<polygon id="L4-C-19" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,615.8 333,641.1 379,666.5 379,641.2"/>
+<polygon id="L4-C-20" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,641.1 333,666.5 379,691.9 379,666.5"/>
+<polygon id="L4-C-21" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,666.5 333,691.8 379,717.2 379,691.9"/>
+<polygon id="L4-C-22" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,691.8 333,717.1 379,742.5 379,717.2"/>
+<polygon id="L4-C-23" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,717.1 333,742.4 379,767.8 379,742.5"/>
+<polygon id="L4-C-24" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,742.4 333,767.7 379,793.1 379,767.8"/>
+<polygon id="L4-C-25" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,767.7 333,793.1 379,818.5 379,793.1"/>
+<polygon id="L4-C-26" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,793.1 333,818.4 379,843.8 379,818.5"/>
+<polygon id="L4-C-27" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,818.4 333,843.7 379,869.1 379,843.8"/>
+<polygon id="L4-C-28" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,843.7 333,869 379,894.4 379,869.1"/>
+<polygon id="L4-C-29" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,869 333,894.4 379,919.8 379,894.4"/>
+<polygon id="L4-C-30" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,894.4 333,919.7 379,945.1 379,919.8"/>
+<polygon id="L4-C-31" class="stall stall-student zone-standard" data-strip="C" data-type="Student" data-zone="standard" fill="#9aa0a6" points="333,919.7 333,945 379,970.4 379,945.1"/>
+<polygon id="L4-D-01" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,183 434,208.1 384,182.7 384,157.6"/>
+<polygon id="L4-D-02" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,208.1 434,233.3 384,207.9 384,182.7"/>
+<polygon id="L4-D-03" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,233.3 434,258.4 384,233 384,207.9"/>
+<polygon id="L4-D-04" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,258.4 434,283.5 384,258.1 384,233"/>
+<polygon id="L4-D-05" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,283.5 434,308.6 384,283.2 384,258.1"/>
+<polygon id="L4-D-06" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,308.6 434,333.8 384,308.4 384,283.2"/>
+<polygon id="L4-D-07" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,333.8 434,358.9 384,333.5 384,308.4"/>
+<polygon id="L4-D-08" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,358.9 434,384 384,358.6 384,333.5"/>
+<polygon id="L4-D-09" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,384 434,409.2 384,383.8 384,358.6"/>
+<polygon id="L4-D-10" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,409.2 434,434.3 384,408.9 384,383.8"/>
+<polygon id="L4-D-11" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,434.3 434,459.4 384,434 384,408.9"/>
+<polygon id="L4-D-12" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,459.4 434,484.5 384,459.1 384,434"/>
+<polygon id="L4-D-13" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,484.5 434,509.7 384,484.3 384,459.1"/>
+<polygon id="L4-D-14" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,509.7 434,534.8 384,509.4 384,484.3"/>
+<polygon id="L4-D-15" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,534.8 434,559.9 384,534.5 384,509.4"/>
+<polygon id="L4-D-16" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,559.9 434,585.1 384,559.7 384,534.5"/>
+<polygon id="L4-D-17" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,585.1 434,610.2 384,584.8 384,559.7"/>
+<polygon id="L4-D-18" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,610.2 434,635.3 384,609.9 384,584.8"/>
+<polygon id="L4-D-19" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,635.3 434,660.5 384,635 384,609.9"/>
+<polygon id="L4-D-20" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,660.5 434,685.6 384,660.2 384,635"/>
+<polygon id="L4-D-21" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,685.6 434,710.7 384,685.3 384,660.2"/>
+<polygon id="L4-D-22" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,710.7 434,735.8 384,710.4 384,685.3"/>
+<polygon id="L4-D-23" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,735.8 434,761 384,735.6 384,710.4"/>
+<polygon id="L4-D-24" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,761 434,786.1 384,760.7 384,735.6"/>
+<polygon id="L4-D-25" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,786.1 434,811.2 384,785.8 384,760.7"/>
+<polygon id="L4-D-26" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,811.2 434,836.4 384,811 384,785.8"/>
+<polygon id="L4-D-27" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,836.4 434,861.5 384,836.1 384,811"/>
+<polygon id="L4-D-28" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,861.5 434,886.6 384,861.2 384,836.1"/>
+<polygon id="L4-D-29" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,886.6 434,911.7 384,886.3 384,861.2"/>
+<polygon id="L4-D-30" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,911.7 434,936.9 384,911.5 384,886.3"/>
+<polygon id="L4-D-31" class="stall stall-student zone-standard" data-strip="D" data-type="Student" data-zone="standard" fill="#9aa0a6" points="434,936.9 434,962 384,936.6 384,911.5"/>
+<polygon id="L4-E-01" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,190 482,215.4 527,190 527,164.6"/>
+<polygon id="L4-E-02" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,215.4 482,240.9 527,215.5 527,190"/>
+<polygon id="L4-E-03" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,240.9 482,266.3 527,240.9 527,215.5"/>
+<polygon id="L4-E-04" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,266.3 482,291.7 527,266.3 527,240.9"/>
+<polygon id="L4-E-05" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,291.7 482,317.2 527,291.8 527,266.3"/>
+<polygon id="L4-E-06" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,317.2 482,342.6 527,317.2 527,291.8"/>
+<polygon id="L4-E-07" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,342.6 482,368 527,342.6 527,317.2"/>
+<polygon id="L4-E-08" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,368 482,393.5 527,368.1 527,342.6"/>
+<polygon id="L4-E-09" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,393.5 482,418.9 527,393.5 527,368.1"/>
+<polygon id="L4-E-10" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,418.9 482,444.3 527,418.9 527,393.5"/>
+<polygon id="L4-E-11" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,444.3 482,469.8 527,444.4 527,418.9"/>
+<polygon id="L4-E-12" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,469.8 482,495.2 527,469.8 527,444.4"/>
+<polygon id="L4-E-13" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,495.2 482,520.6 527,495.2 527,469.8"/>
+<polygon id="L4-E-14" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,520.6 482,546.1 527,520.7 527,495.2"/>
+<polygon id="L4-E-15" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,546.1 482,571.5 527,546.1 527,520.7"/>
+<polygon id="L4-E-16" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,571.5 482,596.9 527,571.5 527,546.1"/>
+<polygon id="L4-E-17" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,596.9 482,622.4 527,597 527,571.5"/>
+<polygon id="L4-E-18" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,622.4 482,647.8 527,622.4 527,597"/>
+<polygon id="L4-E-19" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,647.8 482,673.2 527,647.8 527,622.4"/>
+<polygon id="L4-E-20" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,673.2 482,698.7 527,673.3 527,647.8"/>
+<polygon id="L4-E-21" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,698.7 482,724.1 527,698.7 527,673.3"/>
+<polygon id="L4-E-22" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,724.1 482,749.5 527,724.1 527,698.7"/>
+<polygon id="L4-E-23" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,749.5 482,775 527,749.6 527,724.1"/>
+<polygon id="L4-E-24" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,775 482,800.4 527,775 527,749.6"/>
+<polygon id="L4-E-25" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,800.4 482,825.8 527,800.4 527,775"/>
+<polygon id="L4-E-26" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,825.8 482,851.3 527,825.9 527,800.4"/>
+<polygon id="L4-E-27" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,851.3 482,876.7 527,851.3 527,825.9"/>
+<polygon id="L4-E-28" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,876.7 482,902.1 527,876.7 527,851.3"/>
+<polygon id="L4-E-29" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,902.1 482,927.6 527,902.2 527,876.7"/>
+<polygon id="L4-E-30" class="stall stall-student zone-standard" data-strip="E" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482,927.6 482,953 527,927.6 527,902.2"/>
+<polygon id="L4-F-01" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,180 580,202 530,202 530,180"/>
+<polygon id="L4-F-02" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,202 580,224 530,224 530,202"/>
+<polygon id="L4-F-03" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,224 580,246 530,246 530,224"/>
+<polygon id="L4-F-04" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,246 580,268 530,268 530,246"/>
+<polygon id="L4-F-05" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,268 580,290 530,290 530,268"/>
+<polygon id="L4-F-06" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,290 580,312 530,312 530,290"/>
+<polygon id="L4-F-07" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,312 580,334 530,334 530,312"/>
+<polygon id="L4-F-08" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,334 580,356 530,356 530,334"/>
+<polygon id="L4-F-09" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,356 580,378 530,378 530,356"/>
+<polygon id="L4-F-10" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,378 580,400 530,400 530,378"/>
+<polygon id="L4-F-11" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,400 580,422 530,422 530,400"/>
+<polygon id="L4-F-12" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,422 580,444 530,444 530,422"/>
+<polygon id="L4-F-13" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,444 580,466 530,466 530,444"/>
+<polygon id="L4-F-14" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,466 580,488 530,488 530,466"/>
+<polygon id="L4-F-15" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,488 580,510 530,510 530,488"/>
+<polygon id="L4-F-16" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,510 580,532 530,532 530,510"/>
+<polygon id="L4-F-17" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,532 580,554 530,554 530,532"/>
+<polygon id="L4-F-18" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,554 580,576 530,576 530,554"/>
+<polygon id="L4-F-19" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,576 580,598 530,598 530,576"/>
+<polygon id="L4-F-20" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,598 580,620 530,620 530,598"/>
+<polygon id="L4-F-21" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,620 580,642 530,642 530,620"/>
+<polygon id="L4-F-22" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,642 580,664 530,664 530,642"/>
+<polygon id="L4-F-23" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,664 580,686 530,686 530,664"/>
+<polygon id="L4-F-24" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,686 580,708 530,708 530,686"/>
+<polygon id="L4-F-25" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,708 580,730 530,730 530,708"/>
+<polygon id="L4-F-26" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,730 580,752 530,752 530,730"/>
+<polygon id="L4-F-27" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,752 580,774 530,774 530,752"/>
+<polygon id="L4-F-28" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,774 580,796 530,796 530,774"/>
+<polygon id="L4-F-29" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,796 580,818 530,818 530,796"/>
+<polygon id="L4-F-30" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,818 580,840 530,840 530,818"/>
+<polygon id="L4-F-31" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,840 580,862 530,862 530,840"/>
+<polygon id="L4-F-32" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,862 580,884 530,884 530,862"/>
+<polygon id="L4-F-33" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,884 580,906 530,906 530,884"/>
+<polygon id="L4-F-34" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,906 580,928 530,928 530,906"/>
+<polygon id="L4-F-35" class="stall stall-student zone-standard" data-strip="F" data-type="Student" data-zone="standard" fill="#9aa0a6" points="580,928 580,950 530,950 530,928"/>
+<polygon id="L4-G-01" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,184 628,206.6 673,206.6 673,184"/>
+<polygon id="L4-G-02" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,206.6 628,229.1 673,229.1 673,206.6"/>
+<polygon id="L4-G-03" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,229.1 628,251.7 673,251.7 673,229.1"/>
+<polygon id="L4-G-04" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,251.7 628,274.2 673,274.2 673,251.7"/>
+<polygon id="L4-G-05" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,274.2 628,296.8 673,296.8 673,274.2"/>
+<polygon id="L4-G-06" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,296.8 628,319.4 673,319.4 673,296.8"/>
+<polygon id="L4-G-07" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,319.4 628,341.9 673,341.9 673,319.4"/>
+<polygon id="L4-G-08" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,341.9 628,364.5 673,364.5 673,341.9"/>
+<polygon id="L4-G-09" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,364.5 628,387.1 673,387.1 673,364.5"/>
+<polygon id="L4-G-10" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,387.1 628,409.6 673,409.6 673,387.1"/>
+<polygon id="L4-G-11" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,409.6 628,432.2 673,432.2 673,409.6"/>
+<polygon id="L4-G-12" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,432.2 628,454.8 673,454.8 673,432.2"/>
+<polygon id="L4-G-13" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,454.8 628,477.3 673,477.3 673,454.8"/>
+<polygon id="L4-G-14" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,477.3 628,499.9 673,499.9 673,477.3"/>
+<polygon id="L4-G-15" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,499.9 628,522.4 673,522.4 673,499.9"/>
+<polygon id="L4-G-16" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,522.4 628,545 673,545 673,522.4"/>
+<polygon id="L4-G-17" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,571 628,592.7 673,592.7 673,571"/>
+<polygon id="L4-G-18" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,592.7 628,614.4 673,614.4 673,592.7"/>
+<polygon id="L4-G-19" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,614.4 628,636.1 673,636.1 673,614.4"/>
+<polygon id="L4-G-20" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,636.1 628,657.8 673,657.8 673,636.1"/>
+<polygon id="L4-G-21" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,657.8 628,679.5 673,679.5 673,657.8"/>
+<polygon id="L4-G-22" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,679.5 628,701.2 673,701.2 673,679.5"/>
+<polygon id="L4-G-23" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,701.2 628,722.9 673,722.9 673,701.2"/>
+<polygon id="L4-G-24" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,722.9 628,744.6 673,744.6 673,722.9"/>
+<polygon id="L4-G-25" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,744.6 628,766.4 673,766.4 673,744.6"/>
+<polygon id="L4-G-26" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,766.4 628,788.1 673,788.1 673,766.4"/>
+<polygon id="L4-G-27" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,788.1 628,809.8 673,809.8 673,788.1"/>
+<polygon id="L4-G-28" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,809.8 628,831.5 673,831.5 673,809.8"/>
+<polygon id="L4-G-29" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,831.5 628,853.2 673,853.2 673,831.5"/>
+<polygon id="L4-G-30" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,853.2 628,874.9 673,874.9 673,853.2"/>
+<polygon id="L4-G-31" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,874.9 628,896.6 673,896.6 673,874.9"/>
+<polygon id="L4-G-32" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,896.6 628,918.3 673,918.3 673,896.6"/>
+<polygon id="L4-G-33" class="stall stall-student zone-standard" data-strip="G" data-type="Student" data-zone="standard" fill="#9aa0a6" points="628,918.3 628,940 673,940 673,918.3"/>
+<polygon id="L4-H-01" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,167 728,188.7 682,188.7 682,167"/>
+<polygon id="L4-H-02" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,188.7 728,210.3 682,210.3 682,188.7"/>
+<polygon id="L4-H-03" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,210.3 728,232 682,232 682,210.3"/>
+<polygon id="L4-H-04" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,232 728,253.7 682,253.7 682,232"/>
+<polygon id="L4-H-05" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,253.7 728,275.3 682,275.3 682,253.7"/>
+<polygon id="L4-H-06" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,275.3 728,297 682,297 682,275.3"/>
+<polygon id="L4-H-07" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,297 728,318.7 682,318.7 682,297"/>
+<polygon id="L4-H-08" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,318.7 728,340.3 682,340.3 682,318.7"/>
+<polygon id="L4-H-09" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,340.3 728,362 682,362 682,340.3"/>
+<polygon id="L4-H-10" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,362 728,383.7 682,383.7 682,362"/>
+<polygon id="L4-H-11" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,383.7 728,405.3 682,405.3 682,383.7"/>
+<polygon id="L4-H-12" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,405.3 728,427 682,427 682,405.3"/>
+<polygon id="L4-H-13" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,427 728,448.7 682,448.7 682,427"/>
+<polygon id="L4-H-14" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,448.7 728,470.3 682,470.3 682,448.7"/>
+<polygon id="L4-H-15" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,470.3 728,492 682,492 682,470.3"/>
+<polygon id="L4-H-16" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,492 728,513.7 682,513.7 682,492"/>
+<polygon id="L4-H-17" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,513.7 728,535.3 682,535.3 682,513.7"/>
+<polygon id="L4-H-18" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,535.3 728,557 682,557 682,535.3"/>
+<polygon id="L4-H-19" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,566 728,587.7 682,587.7 682,566"/>
+<polygon id="L4-H-20" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,587.7 728,609.3 682,609.3 682,587.7"/>
+<polygon id="L4-H-21" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,609.3 728,631 682,631 682,609.3"/>
+<polygon id="L4-H-22" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,631 728,652.7 682,652.7 682,631"/>
+<polygon id="L4-H-23" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,652.7 728,674.3 682,674.3 682,652.7"/>
+<polygon id="L4-H-24" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,674.3 728,696 682,696 682,674.3"/>
+<polygon id="L4-H-25" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,696 728,717.7 682,717.7 682,696"/>
+<polygon id="L4-H-26" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,717.7 728,739.3 682,739.3 682,717.7"/>
+<polygon id="L4-H-27" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,739.3 728,761 682,761 682,739.3"/>
+<polygon id="L4-H-28" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,761 728,782.7 682,782.7 682,761"/>
+<polygon id="L4-H-29" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,782.7 728,804.3 682,804.3 682,782.7"/>
+<polygon id="L4-H-30" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,804.3 728,826 682,826 682,804.3"/>
+<polygon id="L4-H-31" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,826 728,847.7 682,847.7 682,826"/>
+<polygon id="L4-H-32" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,847.7 728,869.3 682,869.3 682,847.7"/>
+<polygon id="L4-H-33" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,869.3 728,891 682,891 682,869.3"/>
+<polygon id="L4-H-34" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,891 728,912.7 682,912.7 682,891"/>
+<polygon id="L4-H-35" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,912.7 728,934.3 682,934.3 682,912.7"/>
+<polygon id="L4-H-36" class="stall stall-student zone-standard" data-strip="H" data-type="Student" data-zone="standard" fill="#9aa0a6" points="728,934.3 728,956 682,956 682,934.3"/>
+<polygon id="L4-RO-01" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,107 782,129.4 827,129.4 827,107"/>
+<polygon id="L4-RO-02" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,129.4 782,151.9 827,151.9 827,129.4"/>
+<polygon id="L4-RO-03" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,151.9 782,174.3 827,174.3 827,151.9"/>
+<polygon id="L4-RO-04" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,174.3 782,196.8 827,196.8 827,174.3"/>
+<polygon id="L4-RO-05" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,196.8 782,219.2 827,219.2 827,196.8"/>
+<polygon id="L4-RO-06" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,219.2 782,241.7 827,241.7 827,219.2"/>
+<polygon id="L4-RO-07" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,241.7 782,264.1 827,264.1 827,241.7"/>
+<polygon id="L4-RO-08" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,264.1 782,286.6 827,286.6 827,264.1"/>
+<polygon id="L4-RO-09" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,286.6 782,309 827,309 827,286.6"/>
+<polygon id="L4-RO-10" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,309 782,331.5 827,331.5 827,309"/>
+<polygon id="L4-RO-11" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,331.5 782,353.9 827,353.9 827,331.5"/>
+<polygon id="L4-RO-12" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,353.9 782,376.4 827,376.4 827,353.9"/>
+<polygon id="L4-RO-13" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,376.4 782,398.8 827,398.8 827,376.4"/>
+<polygon id="L4-RO-14" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,398.8 782,421.3 827,421.3 827,398.8"/>
+<polygon id="L4-RO-15" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,421.3 782,443.8 827,443.8 827,421.3"/>
+<polygon id="L4-RO-16" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,443.8 782,466.2 827,466.2 827,443.8"/>
+<polygon id="L4-RO-17" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,466.2 782,488.6 827,488.6 827,466.2"/>
+<polygon id="L4-RO-18" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,488.6 782,511.1 827,511.1 827,488.6"/>
+<polygon id="L4-RO-19" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,511.1 782,533.5 827,533.5 827,511.1"/>
+<polygon id="L4-RO-20" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,533.5 782,556 827,556 827,533.5"/>
+<polygon id="L4-RO-21" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,564 782,585.5 827,585.5 827,564"/>
+<polygon id="L4-RO-22" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,585.5 782,607 827,607 827,585.5"/>
+<polygon id="L4-RO-23" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,607 782,628.6 827,628.6 827,607"/>
+<polygon id="L4-RO-24" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,628.6 782,650.1 827,650.1 827,628.6"/>
+<polygon id="L4-RO-25" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,650.1 782,671.6 827,671.6 827,650.1"/>
+<polygon id="L4-RO-26" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,671.6 782,693.1 827,693.1 827,671.6"/>
+<polygon id="L4-RO-27" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,693.1 782,714.7 827,714.7 827,693.1"/>
+<polygon id="L4-RO-28" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,714.7 782,736.2 827,736.2 827,714.7"/>
+<polygon id="L4-RO-29" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,736.2 782,757.7 827,757.7 827,736.2"/>
+<polygon id="L4-RO-30" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,757.7 782,779.2 827,779.2 827,757.7"/>
+<polygon id="L4-RO-31" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,779.2 782,800.8 827,800.8 827,779.2"/>
+<polygon id="L4-RO-32" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,800.8 782,822.3 827,822.3 827,800.8"/>
+<polygon id="L4-RO-33" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,822.3 782,843.8 827,843.8 827,822.3"/>
+<polygon id="L4-RO-34" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,843.8 782,865.3 827,865.3 827,843.8"/>
+<polygon id="L4-RO-35" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,865.3 782,886.9 827,886.9 827,865.3"/>
+<polygon id="L4-RO-36" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,886.9 782,908.4 827,908.4 827,886.9"/>
+<polygon id="L4-RO-37" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,908.4 782,929.9 827,929.9 827,908.4"/>
+<polygon id="L4-RO-38" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,929.9 782,951.4 827,951.4 827,929.9"/>
+<polygon id="L4-RO-39" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,951.4 782,973 827,973 827,951.4"/>
+<polygon id="L4-RO-40" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,973 782,994.5 827,994.5 827,973"/>
+<polygon id="L4-RO-41" class="stall stall-student zone-standard" data-strip="RO" data-type="Student" data-zone="standard" fill="#9aa0a6" points="782,994.5 782,1016 827,1016 827,994.5"/>
+<polygon id="L4-SW-01" class="stall stall-ada zone-ada" data-strip="SW" data-type="Accessibility (ADA)" data-zone="ada" fill="#2bb5ea" points="186,1023 208,1023 208,1057 186,1057"/>
+<polygon id="L4-SW-02" class="stall stall-ada zone-ada" data-strip="SW" data-type="Accessibility (ADA)" data-zone="ada" fill="#2bb5ea" points="216,1023 238,1023 238,1057 216,1057"/>
+<polygon id="L4-SW-03" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="242,1023 263.8,1023 263.8,1057 242,1057"/>
+<polygon id="L4-SW-04" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="263.8,1023 285.7,1023 285.7,1057 263.8,1057"/>
+<polygon id="L4-SW-05" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="285.7,1023 307.5,1023 307.5,1057 285.7,1057"/>
+<polygon id="L4-SW-06" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="307.5,1023 329.4,1023 329.4,1057 307.5,1057"/>
+<polygon id="L4-SW-07" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="329.4,1023 351.2,1023 351.2,1057 329.4,1057"/>
+<polygon id="L4-SW-08" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="351.2,1023 373.1,1023 373.1,1057 351.2,1057"/>
+<polygon id="L4-SW-09" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="373.1,1023 394.9,1023 394.9,1057 373.1,1057"/>
+<polygon id="L4-SW-10" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="394.9,1023 416.8,1023 416.8,1057 394.9,1057"/>
+<polygon id="L4-SW-11" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="416.8,1023 438.6,1023 438.6,1057 416.8,1057"/>
+<polygon id="L4-SW-12" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="438.6,1023 460.5,1023 460.5,1057 438.6,1057"/>
+<polygon id="L4-SW-13" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="460.5,1023 482.3,1023 482.3,1057 460.5,1057"/>
+<polygon id="L4-SW-14" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="482.3,1023 504.2,1023 504.2,1057 482.3,1057"/>
+<polygon id="L4-SW-15" class="stall stall-student zone-standard" data-strip="SW" data-type="Student" data-zone="standard" fill="#9aa0a6" points="504.2,1023 526,1023 526,1057 504.2,1057"/>
+<polygon id="L4-SE-01" class="stall stall-student zone-standard" data-strip="SE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="547,1023 567.2,1023 567.2,1057 547,1057"/>
+<polygon id="L4-SE-02" class="stall stall-student zone-standard" data-strip="SE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="567.2,1023 587.3,1023 587.3,1057 567.2,1057"/>
+<polygon id="L4-SE-03" class="stall stall-student zone-standard" data-strip="SE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="587.3,1023 607.5,1023 607.5,1057 587.3,1057"/>
+<polygon id="L4-SE-04" class="stall stall-student zone-standard" data-strip="SE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="607.5,1023 627.7,1023 627.7,1057 607.5,1057"/>
+<polygon id="L4-SE-05" class="stall stall-student zone-standard" data-strip="SE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="627.7,1023 647.8,1023 647.8,1057 627.7,1057"/>
+<polygon id="L4-SE-06" class="stall stall-student zone-standard" data-strip="SE" data-type="Student" data-zone="standard" fill="#9aa0a6" points="647.8,1023 668,1023 668,1057 647.8,1057"/>
+<polygon id="L4-SE-07" class="stall stall-ada zone-ada" data-strip="SE" data-type="Accessibility (ADA)" data-zone="ada" fill="#2bb5ea" points="672,1023 694,1023 694,1057 672,1057"/>
+<polygon id="L4-SE-08" class="stall stall-ada zone-ada" data-strip="SE" data-type="Accessibility (ADA)" data-zone="ada" fill="#2bb5ea" points="706,1023 728,1023 728,1057 706,1057"/>
+</g>
+<g id="L4-structure" class="structure" fill="none" stroke="#111" stroke-width="3.5" stroke-linecap="square" stroke-linejoin="round">
+<polyline points="127,62 785,62"/>
+<polyline points="82,100 82,1020"/>
+<polyline points="830,101 830,1019"/>
+<polyline points="127,1060 787,1060"/>
+<path d="M127,62 H91 A19,19 0 0 0 91,100 H127 M127,81 H92"/>
+<path d="M785,63 H819 A19,19 0 0 1 819,101 H785 M785,82 H818"/>
+<path d="M127,1020 H97 A19,19 0 0 0 97,1058 H127 M127,1039 H98"/>
+<path d="M787,1019 H817 A19,19 0 0 1 817,1057 H787 M787,1038 H816"/>
+<path id="L4-elevator-west" class="elevator" d="M153,1060 V1100 H228 V1060 M199,1100 V1078 H228"/>
+<path id="L4-elevator-east" class="elevator" d="M684,1060 V1106 H760 V1060 M709,1060 V1075 H760 M709,1097 H760"/>
+<polyline points="63,561 252,561"/>
+<polyline points="676,560 845,560"/>
+<polyline points="232,173 232,719"/>
+<polyline points="678,173 678,718"/>
+</g>
+<g id="L4-columns" class="columns" fill="#111">
+<rect x="378.5" y="173.5" width="5" height="7"/>
+<rect x="378.5" y="250.1" width="5" height="7"/>
+<rect x="378.5" y="326.7" width="5" height="7"/>
+<rect x="378.5" y="403.3" width="5" height="7"/>
+<rect x="378.5" y="479.9" width="5" height="7"/>
+<rect x="378.5" y="556.5" width="5" height="7"/>
+<rect x="378.5" y="633.1" width="5" height="7"/>
+<rect x="378.5" y="709.7" width="5" height="7"/>
+<rect x="378.5" y="786.3" width="5" height="7"/>
+<rect x="378.5" y="862.9" width="5" height="7"/>
+<rect x="378.5" y="939.5" width="5" height="7"/>
+<rect x="525.5" y="173.5" width="5" height="7"/>
+<rect x="525.5" y="250.1" width="5" height="7"/>
+<rect x="525.5" y="326.7" width="5" height="7"/>
+<rect x="525.5" y="403.3" width="5" height="7"/>
+<rect x="525.5" y="479.9" width="5" height="7"/>
+<rect x="525.5" y="556.5" width="5" height="7"/>
+<rect x="525.5" y="633.1" width="5" height="7"/>
+<rect x="525.5" y="709.7" width="5" height="7"/>
+<rect x="525.5" y="786.3" width="5" height="7"/>
+<rect x="525.5" y="862.9" width="5" height="7"/>
+<rect x="525.5" y="939.5" width="5" height="7"/>
+<rect x="229.5" y="788.5" width="5" height="7"/>
+<rect x="229.5" y="864.5" width="5" height="7"/>
+<rect x="229.5" y="941.5" width="5" height="7"/>
+<rect x="675.5" y="785.5" width="5" height="7"/>
+<rect x="675.5" y="861.5" width="5" height="7"/>
+<rect x="675.5" y="938.5" width="5" height="7"/>
+</g>
+<g id="L4-arrows" class="arrows" fill="none" stroke="#111" stroke-width="2">
+<polyline points="287,133 305,133 305,165" marker-end="url(#ah-L4)"/>
+<polyline points="460,136 460,121 420,121" marker-end="url(#ah-L4)"/>
+<polyline points="458,169 458,155" marker-end="url(#ah-L4)"/>
+<polyline points="669,121 605,121 605,138" marker-end="url(#ah-L4)"/>
+<polyline points="142,150 142,164" marker-end="url(#ah-L4)"/>
+<polyline points="154,164 154,150" marker-end="url(#ah-L4)"/>
+<polyline points="597,153 597,167" marker-end="url(#ah-L4)"/>
+<polyline points="609,167 609,153" marker-end="url(#ah-L4)"/>
+<polyline points="746,153 746,167" marker-end="url(#ah-L4)"/>
+<polyline points="758,167 758,153" marker-end="url(#ah-L4)"/>
+<polyline points="307,555 307,569" marker-end="url(#ah-L4)"/>
+<polyline points="305,933 305,947" marker-end="url(#ah-L4)"/>
+<polyline points="594,564 594,578" marker-end="url(#ah-L4)"/>
+<polyline points="606,578 606,564" marker-end="url(#ah-L4)"/>
+<polyline points="270,968 256,968" marker-end="url(#ah-L4)"/>
+<polyline points="256,997 270,997" marker-end="url(#ah-L4)"/>
+<polyline points="423,990 458,990 458,940" marker-end="url(#ah-L4)"/>
+<polyline points="590,935 590,949" marker-end="url(#ah-L4)"/>
+<polyline points="632,970 610,970 610,935" marker-end="url(#ah-L4)"/>
+<polyline points="588,980 588,996 630,996" marker-end="url(#ah-L4)"/>
+<polyline points="151,505 151,519" marker-end="url(#ah-L4)"/>
+<polyline points="163,519 163,505" marker-end="url(#ah-L4)"/>
+<polyline points="749,507 749,521" marker-end="url(#ah-L4)"/>
+<polyline points="761,521 761,507" marker-end="url(#ah-L4)"/>
+<polyline points="151,575 151,589" marker-end="url(#ah-L4)"/>
+<polyline points="163,589 163,575" marker-end="url(#ah-L4)"/>
+<polyline points="749,575 749,589" marker-end="url(#ah-L4)"/>
+<polyline points="761,589 761,575" marker-end="url(#ah-L4)"/>
+</g>
+<g id="L4-labels" class="labels" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="#111" text-anchor="middle">
+<text class="label" x="190" y="988" font-size="9">ELEVATOR</text>
+<text class="label" x="724" y="988" font-size="9">ELEVATOR</text>
+<text class="label" x="157" y="488" font-size="9">RAMP</text>
+<text class="label" x="157" y="498" font-size="9">DOWN</text>
+<text class="label" x="755" y="490" font-size="9">RAMP</text>
+<text class="label" x="755" y="500" font-size="9">DOWN</text>
+<text class="label" x="157" y="604" font-size="9">RAMP</text>
+<text class="label" x="157" y="614" font-size="9">UP</text>
+<text class="label" x="755" y="604" font-size="9">RAMP</text>
+<text class="label" x="755" y="614" font-size="9">UP</text>
+<text class="title" x="455" y="40" font-size="13">LEVEL 4</text>
+</g></svg>
