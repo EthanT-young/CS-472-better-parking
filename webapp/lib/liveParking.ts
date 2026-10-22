@@ -31,17 +31,16 @@ const stallTargets: Record<string, number> = {
   level4: 0.66,
   level5: 0.48,
   level6: 0.3,
+  "tropicana-level1": 0.95,
+  "tropicana-level2": 0.88,
+  "tropicana-level3": 0.76,
+  "tropicana-level4": 0.58,
 };
 
 const countLayouts: Record<
   string,
   { totals: Record<CountGroup, number>; target: number }
 > = {
-  "tropicana-level1": { totals: { student: 150, staff: 120, other: 30 }, target: 0.95 },
-  "tropicana-level2": { totals: { student: 300, staff: 40, other: 12 }, target: 0.92 },
-  "tropicana-level3": { totals: { student: 340, staff: 0, other: 12 }, target: 0.85 },
-  "tropicana-level4": { totals: { student: 340, staff: 0, other: 12 }, target: 0.74 },
-  "tropicana-level5": { totals: { student: 310, staff: 0, other: 10 }, target: 0.58 },
   "thomas-mack-surface": { totals: { student: 900, staff: 120, other: 80 }, target: 0.35 },
 };
 

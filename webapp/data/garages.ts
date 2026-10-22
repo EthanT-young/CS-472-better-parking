@@ -1,21 +1,20 @@
 import rawStallsCG from "./garage-stalls-CG.json";
+import rawStallsTR from "./garage-stalls-TR.json";
 
 import type { Garage, Level, Stall } from "@/types/parking";
 
-// The garage with a mapped, stall-by-stall floor plan (from the parkingWeb prototype).
-const stallLevels: Level[] = Object.entries(
-  rawStallsCG.levels as Record<string, Stall[]>
-).map(([levelId, stalls], index) => ({
-  id: levelId,
-  name: index === 0 ? "Level 1" : `Level ${index + 1}`,
-  imageUrl: `/maps/garage-1/${levelId}.svg`,
-  stalls,
-}));
-
-function countOnlyLevels(prefix: string, count: number): Level[] {
-  return Array.from({ length: count }, (_, index) => ({
-    id: `${prefix}-level${index + 1}`,
+// Garages with a stall-by-stall floor plan. Cottage Grove comes from the parkingWeb
+// prototype; Tropicana was traced from UNLV Park and Go floor screenshots.
+function stallLevels(
+  raw: { levels: Record<string, Stall[]> },
+  mapFolder: string,
+  idPrefix = ""
+): Level[] {
+  return Object.entries(raw.levels).map(([levelId, stalls], index) => ({
+    id: `${idPrefix}${levelId}`,
     name: `Level ${index + 1}`,
+    imageUrl: `/maps/${mapFolder}/${levelId}.svg`,
+    stalls,
   }));
 }
 
@@ -28,7 +27,7 @@ export const garages: Garage[] = [
     kind: "garage",
     location: [36.1115, -115.1398],
     viewBox: rawStallsCG.viewBox,
-    levels: stallLevels,
+    levels: stallLevels(rawStallsCG, "garage-1"),
   },
   {
     id: "tropicana",
@@ -36,7 +35,8 @@ export const garages: Garage[] = [
     shortName: "Tropicana",
     kind: "garage",
     location: [36.1013, -115.1441],
-    levels: countOnlyLevels("tropicana", 5),
+    viewBox: rawStallsTR.viewBox,
+    levels: stallLevels(rawStallsTR, "garage-2", "tropicana-"),
   },
   {
     id: "thomas-mack",
