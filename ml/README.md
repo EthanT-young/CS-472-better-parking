@@ -59,11 +59,15 @@ print(f"Vehicles detected: {count}")
 
 | Option | Description | Default |
 | --- | --- | --- |
-| `--image` | Path to image file (required) | - |
+| `--image` | One or more image files and/or folders of images (required) | - |
 | `--model` | Path to model weights file | `models/parking_detector.pt` |
 | `--classes` | COCO class IDs to detect (space-separated) | `2 3 5 7` (car, motorcycle, bus, truck) |
+| `--conf` | Minimum detection confidence | `0.5` |
+| `--batch` | Images per inference batch | `8` |
 | `--visualize` | Save an annotated image with bounding boxes | False |
-| `--output` | Where to save the visual output (used with `--visualize`) | `output.jpg` |
+| `--output` | Where to save the visual output (used with `--visualize`): a file for one image, a folder for several | `output.jpg` / `output/` |
+
+Pass all your images in one command rather than running the script once per image. The model loads once and the images run in batches, which is much faster than starting a new process for each image.
 
 ### Examples
 
@@ -82,6 +86,13 @@ python predict.py --image garage.jpg --visualize
 
 # Visualize and save to a custom file
 python predict.py --image garage.jpg --visualize --output my_results.jpg
+
+# Count vehicles in several images, or every image in a folder
+python predict.py --image a.jpg b.jpg c.jpg
+python predict.py --image path/to/garage_images/
+
+# Annotate a whole folder, saving the results into annotated/
+python predict.py --image path/to/garage_images/ --visualize --output annotated/
 
 
 ```
@@ -136,6 +147,21 @@ detector.visualize("garage.jpg", "annotated_output.jpg")
 
 ```
 
+#### `predict_many(image_paths, min_confidence=0.5, batch=8)`
+
+Run detection on multiple images at once instead of calling predict for multiple images in a loop. Each result is an ultralytics Results object.
+
+```python
+from predict import ParkingDetector, collect_images
+
+# expands folders into image paths
+images = collect_images(["garage_images/"])  
+for result in detector.predict_many(images):
+    print(f"{result.path}: {len(result.boxes)} vehicles")
+
+
+```
+
 ## Vehicle Classes (COCO IDs)
 
 | Class ID | Vehicle Type |
@@ -180,7 +206,7 @@ print(f"{status['available']} of {status['total']} spots available")
 
 ## Troubleshooting
 
-**"Model file not found"** — Run `python update.py` first to get the latest model.
+**"Model file not found"** — Run `python updateModel.py` first to get the latest model.
 
 **"ModuleNotFoundError: No module named 'ultralytics'"** — Your Conda environment is not activated. Run `conda activate <your_env_name>`.
 
