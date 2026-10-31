@@ -40,9 +40,17 @@ const state = {
   images: [],
   selected: null,   // image name in current folder
   image: null,      // loaded HTMLImageElement
-  detections: null, // detections for the current image, in image pixel coordinates
+  detections: null, // all detections for the current image, in image pixel coordinates
   requestId: 0,
+  runTimer: null,
+  results: new Map(), // "model|path" -> detections, so revisiting an image doesn't rerun the model
 };
+
+// The model runs once per image at the slider's minimum confidence with every class.
+// Moving the slider or toggling classes then only filters those results in the browser.
+const CONF_FLOOR = Number($("#conf-input").min);
+const ALL_CLASSES = [...document.querySelectorAll(".classes input")].map((el) => Number(el.value));
+const MAX_CACHED_RESULTS = 500;
 
 const canvas = $("#canvas");
 const ctx = canvas.getContext("2d");
@@ -121,6 +129,7 @@ function imagePath() {
 }
 
 function selectImage(name) {
+  clearTimeout(state.runTimer);
   state.selected = name;
   state.detections = null;
   document.querySelectorAll("#file-list li[data-name]").forEach((li) => {
@@ -137,7 +146,7 @@ function selectImage(name) {
     state.image = img;
     $("#stage-message").textContent = "";
     render();
-    if ($("#auto-input").checked) runModel();
+    if ($("#auto-input").checked) scheduleRun();
   };
   img.onerror = () => { $("#stage-message").textContent = `Could not load ${name}`; };
   img.src = `/api/image?path=${encodeURIComponent(imagePath())}`;
@@ -147,14 +156,34 @@ function selectedClasses() {
   return [...document.querySelectorAll(".classes input:checked")].map((el) => Number(el.value));
 }
 
-async function runModel() {
-  if (!state.selected) return setResult("Select an image first", "");
+function visibleDetections() {
   const classes = selectedClasses();
-  if (!classes.length) return setResult("Select at least one vehicle class", "");
+  const conf = Number($("#conf-input").value);
+  return state.detections.filter((d) => classes.includes(d.class_id) && d.confidence >= conf);
+}
+
+function resultKey() {
+  return `${$("#model-input").value}|${imagePath()}`;
+}
+
+// Shows saved results right away; otherwise waits briefly so arrowing quickly
+// through the list only runs the model on the image you stop on
+function scheduleRun() {
+  clearTimeout(state.runTimer);
+  const saved = state.results.get(resultKey());
+  if (saved) return showDetections(saved);
+  state.runTimer = setTimeout(runModel, 150);
+}
+
+// Always runs the model, so the Run button also refreshes saved results
+async function runModel() {
+  clearTimeout(state.runTimer);
+  if (!state.selected) return setResult("Select an image first", "");
 
   // Only the latest request's response is shown (e.g. when arrowing through the list)
   const id = ++state.requestId;
   const name = state.selected;
+  const key = resultKey();
   $("#run-btn").disabled = true;
   setResult(name, "Running model…");
   try {
@@ -163,20 +192,35 @@ async function runModel() {
       body: {
         path: imagePath(),
         model: $("#model-input").value,
-        classes,
-        conf: Number($("#conf-input").value),
+        classes: ALL_CLASSES,
+        conf: CONF_FLOOR,
       },
     });
+    state.results.delete(key);
+    state.results.set(key, data.detections);
+    if (state.results.size > MAX_CACHED_RESULTS) state.results.delete(state.results.keys().next().value);
     if (id !== state.requestId) return;
-    state.detections = data.detections;
-    $("#save-btn").disabled = false;
-    setResult(`${name} — ${data.count} vehicle${data.count === 1 ? "" : "s"} detected`, summarize(data.detections));
-    render();
+    showDetections(data.detections);
   } catch (err) {
     if (id === state.requestId) setResult(name, `Error: ${err.message}`);
   } finally {
     if (id === state.requestId) $("#run-btn").disabled = false;
   }
+}
+
+function showDetections(detections) {
+  state.detections = detections;
+  $("#save-btn").disabled = false;
+  refilter();
+}
+
+// Re-applies the confidence and class filters without rerunning the model
+function refilter() {
+  if (state.detections) {
+    const shown = visibleDetections();
+    setResult(`${state.selected} — ${shown.length} vehicle${shown.length === 1 ? "" : "s"} detected`, summarize(shown));
+  }
+  render();
 }
 
 function summarize(detections) {
@@ -190,15 +234,15 @@ function setResult(title, detail) {
   $("#result-detail").textContent = detail;
 }
 
-function rerunIfAuto() {
-  if ($("#auto-input").checked && state.image) runModel();
-}
-
 $("#run-btn").addEventListener("click", runModel);
-$("#conf-input").addEventListener("input", (e) => { $("#conf-value").textContent = Number(e.target.value).toFixed(2); });
-$("#conf-input").addEventListener("change", rerunIfAuto);
-$("#model-input").addEventListener("change", rerunIfAuto);
-document.querySelectorAll(".classes input").forEach((el) => el.addEventListener("change", rerunIfAuto));
+$("#conf-input").addEventListener("input", (e) => {
+  $("#conf-value").textContent = Number(e.target.value).toFixed(2);
+  refilter();
+});
+$("#model-input").addEventListener("change", () => {
+  if ($("#auto-input").checked && state.image) scheduleRun();
+});
+document.querySelectorAll(".classes input").forEach((el) => el.addEventListener("change", refilter));
 $("#boxes-input").addEventListener("change", render);
 
 /* ---------- Predict: drawing ---------- */
@@ -217,7 +261,7 @@ function drawDetections(context, scale, offsetX, offsetY) {
   context.lineWidth = lineWidth;
   context.textBaseline = "top";
 
-  for (const d of state.detections) {
+  for (const d of visibleDetections()) {
     const [x1, y1, x2, y2] = d.bbox;
     const x = offsetX + x1 * scale;
     const y = offsetY + y1 * scale;
