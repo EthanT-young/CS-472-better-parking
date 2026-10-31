@@ -25,30 +25,58 @@ class ParkingDetector:
         # If we want to sort by types of vehicles i added the option
         self.vehicle_classes = vehicle_classes if vehicle_classes else [2, 3, 5, 7]
 
-    def _predict(self, source, min_confidence, **kwargs):
-        return self.model(source, conf=min_confidence, classes=self.vehicle_classes, verbose=False, **kwargs)
+    def _predict(self, source, min_confidence, classes=None, **kwargs):
+        # classes overrides vehicle_classes for a single call
+        classes = classes if classes else self.vehicle_classes
+        return self.model(source, conf=min_confidence, classes=classes, verbose=False, **kwargs)
 
-    def predict_many(self, image_paths, min_confidence=0.5, batch=8):
-        # Runs the images through the model in batches and yields results one at a time,
-        # so the model is loaded once and memory stays flat for large folders
-        return self._predict([str(p) for p in image_paths], min_confidence, stream=True, batch=batch)
+    def predict_many(self, image_paths, min_confidence=0.5, batch=8, on_error=None):
+        # Model runs in batches, loads once and is focused on large image folders
+        # If a corrupted image is detecthed, the batch is re-run with one image at a time.
+        paths = [str(p) for p in image_paths]
+        for i in range(0, len(paths), batch):
+            chunk = paths[i:i + batch]
+            errors = {}
+            try:
+                results = self._predict(chunk, min_confidence, batch=batch)
+            except Exception:
+                results = []
+                for path in chunk:
+                    try:
+                        results += self._predict(path, min_confidence)
+                    except Exception as error:
+                        errors[path] = error
+
+            # ultralytics drops most unreadable images with just a warning, so check for missing ones too
+            returned = {Path(r.path).resolve() for r in results}
+            for path in chunk:
+                if path not in errors and Path(path).resolve() not in returned:
+                    errors[path] = OSError("could not read image")
+
+            for path, error in errors.items():
+                if on_error is None:
+                    raise error
+                on_error(path, error)
+            yield from results
 
     def count_vehicles(self, image_path, min_confidence=0.5):
         # Pass list of vehicle classes
         results = self._predict(image_path, min_confidence)
         return len(results[0].boxes)
 
-    def get_detections(self, image_path, min_confidence=0.5):
-        results = self._predict(image_path, min_confidence)
+    def get_detections(self, image_path, min_confidence=0.5, classes=None):
+        results = self._predict(image_path, min_confidence, classes)
         detections = []
 
-        for box in results[0].boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0][:4])
+        # Grabs all boxes from GPU now to the CPU, reducing sync time
+        boxes = results[0].boxes.cpu()
+        for (x1, y1, x2, y2), conf, cls in zip(boxes.xyxy.int().tolist(), boxes.conf.tolist(), boxes.cls.int().tolist()):
             detections.append({
                 "bbox": [x1, y1, x2, y2],
                 "center": ((x1 + x2) // 2, (y1 + y2) // 2),
-                "confidence": float(box.conf[0]),
-                "class_id": int(box.cls[0])
+                "confidence": conf,
+                "class_id": cls,
+                "class_name": self.model.names.get(cls, str(cls))
             })
 
         return detections
@@ -61,6 +89,7 @@ class ParkingDetector:
 
 if __name__ == "__main__":
     import argparse
+    import sys
     parser = argparse.ArgumentParser()
     parser.add_argument("--image", required=True, nargs="+", help="Image paths and/or folders of images")
     parser.add_argument("--model", default="models/parking_detector.pt")
@@ -95,8 +124,14 @@ if __name__ == "__main__":
 
     detector = ParkingDetector(args.model, vehicle_classes=args.classes)
 
+    # Unreadable images are reported and skipped so one bad file doesn't stop a long run
+    skipped = []
+    def skip(path, error):
+        skipped.append(path)
+        print(f"Skipping {path}: {error}", file=sys.stderr)
+
     total = 0
-    for result in detector.predict_many(images, min_confidence=args.conf, batch=args.batch):
+    for result in detector.predict_many(images, min_confidence=args.conf, batch=args.batch, on_error=skip):
         count = len(result.boxes)
         total += count
         print(f"Vehicles detected: {count}" if single else f"{result.path}: {count}")
@@ -107,4 +142,8 @@ if __name__ == "__main__":
             print(f"Saved annotated image to {out_path}")
 
     if not single:
-        print(f"Total vehicles detected: {total} across {len(images)} images")
+        processed = len(images) - len(skipped)
+        print(f"Total vehicles detected: {total} across {processed} images"
+              + (f" ({len(skipped)} skipped)" if skipped else ""))
+    if skipped:
+        sys.exit(1)
