@@ -97,15 +97,15 @@ def predict(req: PredictRequest):
         raise HTTPException(404, f"Model not found: {model_path}")
 
     with _detector_lock:
-        key = (str(model_path), tuple(req.classes))
-        if key not in _detectors:
-            _detectors[key] = ParkingDetector(str(model_path), vehicle_classes=req.classes)
-        detector = _detectors[key]
-        detections = detector.get_detections(str(image_path), min_confidence=req.conf)
+        # One detector per weights file (classes are passed per call). Reload if the file
+        # changed, e.g. a training run saved new weights over it.
+        key = str(model_path)
+        mtime = model_path.stat().st_mtime
+        if key not in _detectors or _detectors[key][0] != mtime:
+            _detectors[key] = (mtime, ParkingDetector(key))
+        detector = _detectors[key][1]
+        detections = detector.get_detections(str(image_path), min_confidence=req.conf, classes=req.classes)
 
-    names = detector.model.names
-    for det in detections:
-        det["class_name"] = names.get(det["class_id"], str(det["class_id"]))
     return {"detections": detections, "count": len(detections)}
 
 
