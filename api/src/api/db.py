@@ -3,7 +3,7 @@ from .config import settings
 
 supabase: Client = create_client(
     settings.supabase_url,
-    settings.supabase_secret_key,
+    settings.supabase_key,
     options=ClientOptions(schema="parking"),
 )
 
