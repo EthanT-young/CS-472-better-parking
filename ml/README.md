@@ -69,7 +69,7 @@ cd ml/
 python gui.py          # then open http://127.0.0.1:8000
 ```
 
-- **Predict**: type or browse to a folder in the sidebar, then click an image (or use the arrow keys) to run the model on it. Detections are drawn over the image. Change the model, confidence, and vehicle classes in the toolbar. The confidence slider and class checkboxes filter the results instantly without rerunning the model, and results are remembered when you revisit an image. Click *Run* to force a fresh run. *Save annotated* downloads the image with its boxes.
+- **Predict**: type or browse to a folder in the sidebar, then click an image (or use the arrow keys) to run the model on it. Detections are drawn over the image, with a dot at the center of each box labeled with its pixel coordinates in the original image. *Boxes* and *Centers* show or hide each. Change the model, confidence, and vehicle classes in the toolbar. The confidence slider and class checkboxes filter the results instantly without rerunning the model, and results are remembered when you revisit an image. Click *Run* to force a fresh run. *Save annotated* downloads the image with its boxes.
 - **Train**: same options as `train.py`. Output streams into the log, and *Stop* cancels the run.
 - **Test**: runs `test.py` against a dataset split and shows the mAP results in the log.
 
@@ -83,6 +83,17 @@ python predict.py --image path/to/garage_image.jpg
 
 
 ```
+
+Prints the vehicle count, then each vehicle's class, confidence, and the center `(x, y)` of its bounding box in pixels:
+
+```
+Vehicles detected: 2
+  car 0.91 center (608, 383)
+  truck 0.78 center (1520, 940)
+Saved mask to /…/ml/masks/garage_image.jpg
+```
+
+Every run also saves a mask of each image to `ml/masks/`: the original image with everything outside the detected vehicles' bounding boxes blacked out. Masks keep the image's file name (HEIC images are saved as `.jpg`) and are overwritten on the next run of the same image. They use the same `--conf` and `--classes` as the detections, so `--classes 2` masks only cars.
 
 ### Python Code
 
@@ -113,7 +124,7 @@ Pass all your images in one command rather than running the script once per imag
 ### Examples
 
 ```bash
-# Count all vehicles
+# Count all vehicles and print their centers
 python predict.py --image garage.jpg
 
 # Detect only cars
@@ -171,14 +182,25 @@ Get detailed detection results for each vehicle.
 ```python
 detections = detector.get_detections("garage.jpg")
 for det in detections:
-    print(f"BBox: {det['bbox']}, Confidence: {det['confidence']:.2f}")
+    print(f"BBox: {det['bbox']}, Center: {det['center']}, Confidence: {det['confidence']:.2f}")
 
 
 ```
 
 `image_path` can also be an image already in memory (a NumPy array as returned by `cv2.imread`/`cv2.imdecode`).
 
-Returns list of dicts with keys: `bbox`, `center`, `confidence`, `class_id`, `class_name`
+Returns list of dicts with keys: `bbox` (`[x1, y1, x2, y2]`), `center` (`(x, y)`, the middle of `bbox`), `confidence`, `class_id`, `class_name`. All coordinates are pixels in the original image.
+
+#### `get_centers(image_path, min_confidence=0.5, classes=None)`
+
+Get just the center `(x, y)` of each vehicle's bounding box, in pixels. Useful for checking which parking spot each vehicle is in.
+
+```python
+centers = detector.get_centers("garage.jpg")
+print(centers)  # e.g., [(608, 383), (1520, 940)]
+
+
+```
 
 #### `visualize(image_path, output_path="output.jpg", min_confidence=0.5)`
 
@@ -186,6 +208,21 @@ Run detection and save annotated image with bounding boxes.
 
 ```python
 detector.visualize("garage.jpg", "annotated_output.jpg")
+
+
+```
+
+#### `mask_image(image, detections)`
+
+A function in `predict.py` (not a method) that returns a copy of the image with everything outside the detected vehicles' bounding boxes blacked out. This is the mask the command line saves to `ml/masks/`. Pass the image as a NumPy array, along with the detections found in that same array:
+
+```python
+import cv2
+from predict import mask_image
+
+image = cv2.imread("garage.jpg")
+masked = mask_image(image, detector.get_detections(image))
+cv2.imwrite("garage_mask.jpg", masked)
 
 
 ```
@@ -201,6 +238,17 @@ from predict import ParkingDetector, collect_images
 images = collect_images(["garage_images/"])  
 for result in detector.predict_many(images):
     print(f"{result.path}: {len(result.boxes)} vehicles")
+
+
+```
+
+To get the same detection dicts as `get_detections` (with `center`), pass each result to `to_detections`:
+
+```python
+from predict import to_detections
+
+for result in detector.predict_many(images):
+    centers = [det["center"] for det in to_detections(result)]
 
 
 ```

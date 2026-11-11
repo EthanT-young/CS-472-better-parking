@@ -244,6 +244,7 @@ $("#model-input").addEventListener("change", () => {
 });
 document.querySelectorAll(".classes input").forEach((el) => el.addEventListener("change", refilter));
 $("#boxes-input").addEventListener("change", render);
+$("#centers-input").addEventListener("change", render);
 
 /* ---------- Predict: drawing ---------- */
 
@@ -251,33 +252,64 @@ $("#boxes-input").addEventListener("change", render);
 function drawScene(context, scale, offsetX, offsetY) {
   const img = state.image;
   context.drawImage(img, offsetX, offsetY, img.width * scale, img.height * scale);
-  if (state.detections && $("#boxes-input").checked) drawDetections(context, scale, offsetX, offsetY);
+  if (state.detections && ($("#boxes-input").checked || $("#centers-input").checked)) {
+    drawDetections(context, scale, offsetX, offsetY);
+  }
 }
 
 function drawDetections(context, scale, offsetX, offsetY) {
   const lineWidth = Math.max(2, Math.round(2 * scale * Math.max(1, state.image.width / 1000)));
   const fontSize = Math.max(12, Math.round(lineWidth * 6));
+  const pad = fontSize * 0.25;
+  const h = fontSize + pad * 2;
   context.font = `600 ${fontSize}px system-ui, sans-serif`;
-  context.lineWidth = lineWidth;
   context.textBaseline = "top";
 
-  for (const d of visibleDetections()) {
-    const [x1, y1, x2, y2] = d.bbox;
-    const x = offsetX + x1 * scale;
-    const y = offsetY + y1 * scale;
-    const color = colorFor(d.class_id);
-    context.strokeStyle = color;
-    context.strokeRect(x, y, (x2 - x1) * scale, (y2 - y1) * scale);
-
-    const label = `${d.class_name} ${d.confidence.toFixed(2)}`;
-    const pad = fontSize * 0.25;
-    const w = context.measureText(label).width + pad * 2;
-    const h = fontSize + pad * 2;
-    const ly = y - h < 0 ? y : y - h;
+  // White text on a colored background, with its top-left corner at (x, y)
+  const tag = (text, x, y, color) => {
     context.fillStyle = color;
-    context.fillRect(x - lineWidth / 2, ly, w, h);
+    context.fillRect(x, y, context.measureText(text).width + pad * 2, h);
     context.fillStyle = "#fff";
-    context.fillText(label, x - lineWidth / 2 + pad, ly + pad);
+    context.fillText(text, x + pad, y + pad);
+  };
+
+  const detections = visibleDetections();
+  if ($("#boxes-input").checked) {
+    context.lineWidth = lineWidth;
+    for (const d of detections) {
+      const [x1, y1, x2, y2] = d.bbox;
+      const x = offsetX + x1 * scale;
+      const y = offsetY + y1 * scale;
+      const color = colorFor(d.class_id);
+      context.strokeStyle = color;
+      context.strokeRect(x, y, (x2 - x1) * scale, (y2 - y1) * scale);
+      tag(`${d.class_name} ${d.confidence.toFixed(2)}`, x - lineWidth / 2, y - h < 0 ? y : y - h, color);
+    }
+  }
+
+  // Drawn after all boxes so no box covers a center. Coordinates are in original image pixels.
+  if ($("#centers-input").checked) {
+    const radius = lineWidth * 2;
+    const right = offsetX + state.image.width * scale;
+    context.lineWidth = Math.max(1, lineWidth / 2);
+    for (const d of detections) {
+      const [cx, cy] = d.center;
+      const x = offsetX + cx * scale;
+      const y = offsetY + cy * scale;
+      const color = colorFor(d.class_id);
+      context.beginPath();
+      context.arc(x, y, radius, 0, 2 * Math.PI);
+      context.fillStyle = color;
+      context.fill();
+      context.strokeStyle = "#fff";
+      context.stroke();
+
+      // Coordinates go right of the dot, or left of it when they would run off the image
+      const text = `(${cx}, ${cy})`;
+      const w = context.measureText(text).width + pad * 2;
+      const tx = x + radius + pad + w <= right ? x + radius + pad : x - radius - pad - w;
+      tag(text, tx, y - h / 2, color);
+    }
   }
 }
 

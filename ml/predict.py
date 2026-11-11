@@ -1,8 +1,11 @@
 from pathlib import Path
 from ultralytics import YOLO
 import cv2
+import numpy as np
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+# The command line saves a mask of every image here (ml/masks), wherever it's run from
+MASKS_DIR = Path(__file__).resolve().parent / "masks"
 
 
 def collect_images(paths):
@@ -16,6 +19,38 @@ def collect_images(paths):
         else:
             raise FileNotFoundError(f"No such image or folder: {path}")
     return images
+
+
+def to_detections(result):
+    """Convert one ultralytics result into a list of detections in pixel coordinates.
+
+    Each detection has bbox [x1, y1, x2, y2], center (x, y) of the bbox, confidence,
+    class_id and class_name.
+    """
+    # Grabs all boxes from GPU now to the CPU, reducing sync time
+    boxes = result.boxes.cpu()
+    detections = []
+    for (x1, y1, x2, y2), conf, cls in zip(boxes.xyxy.int().tolist(), boxes.conf.tolist(), boxes.cls.int().tolist()):
+        detections.append({
+            "bbox": [x1, y1, x2, y2],
+            "center": ((x1 + x2) // 2, (y1 + y2) // 2),
+            "confidence": conf,
+            "class_id": cls,
+            "class_name": result.names.get(cls, str(cls))
+        })
+    return detections
+
+
+def mask_image(image, detections):
+    """Return a copy of image that keeps only the pixels inside the detection boxes; the rest is black.
+
+    image is a BGR NumPy array (e.g. from cv2.imread), and detections are the ones found in that
+    same image (from get_detections or to_detections).
+    """
+    masked = np.zeros_like(image)
+    for x1, y1, x2, y2 in (d["bbox"] for d in detections):
+        masked[y1:y2, x1:x2] = image[y1:y2, x1:x2]
+    return masked
 
 
 class ParkingDetector:
@@ -65,21 +100,11 @@ class ParkingDetector:
         return len(results[0].boxes)
 
     def get_detections(self, image_path, min_confidence=0.5, classes=None):
-        results = self._predict(image_path, min_confidence, classes)
-        detections = []
+        return to_detections(self._predict(image_path, min_confidence, classes)[0])
 
-        # Grabs all boxes from GPU now to the CPU, reducing sync time
-        boxes = results[0].boxes.cpu()
-        for (x1, y1, x2, y2), conf, cls in zip(boxes.xyxy.int().tolist(), boxes.conf.tolist(), boxes.cls.int().tolist()):
-            detections.append({
-                "bbox": [x1, y1, x2, y2],
-                "center": ((x1 + x2) // 2, (y1 + y2) // 2),
-                "confidence": conf,
-                "class_id": cls,
-                "class_name": self.model.names.get(cls, str(cls))
-            })
-
-        return detections
+    def get_centers(self, image_path, min_confidence=0.5, classes=None):
+        # Center (x, y) of each vehicle's bounding box in pixels, e.g. to check which spot it's in
+        return [d["center"] for d in self.get_detections(image_path, min_confidence, classes)]
 
     def visualize(self, image_path, output_path="output.jpg", min_confidence=0.5):
         results = self._predict(image_path, min_confidence)
@@ -121,6 +146,7 @@ if __name__ == "__main__":
         output = Path(args.output or ("output.jpg" if single else "output"))
         if not single:
             output.mkdir(parents=True, exist_ok=True)
+    MASKS_DIR.mkdir(parents=True, exist_ok=True)
 
     detector = ParkingDetector(args.model, vehicle_classes=args.classes)
 
@@ -132,9 +158,23 @@ if __name__ == "__main__":
 
     total = 0
     for result in detector.predict_many(images, min_confidence=args.conf, batch=args.batch, on_error=skip):
-        count = len(result.boxes)
+        detections = to_detections(result)
+        count = len(detections)
         total += count
         print(f"Vehicles detected: {count}" if single else f"{result.path}: {count}")
+        # Center (x, y) of each bounding box, in pixels of the original image
+        for d in detections:
+            print(f"  {d['class_name']} {d['confidence']:.2f} center {d['center']}")
+
+        # Mask: the original image with everything except the detected vehicles blacked out.
+        # Keeps the image's file name; formats OpenCV can't write (e.g. HEIC) are saved as JPEG.
+        image_path = Path(result.path)
+        suffix = image_path.suffix if image_path.suffix.lower() in IMAGE_EXTS else ".jpg"
+        mask_path = MASKS_DIR / (image_path.stem + suffix)
+        if not cv2.imwrite(str(mask_path), mask_image(result.orig_img, detections)):
+            raise OSError(f"Could not save mask to {mask_path}")
+        if single:
+            print(f"Saved mask to {mask_path}")
 
         if args.visualize:
             out_path = output if single else output / Path(result.path).name
@@ -145,5 +185,6 @@ if __name__ == "__main__":
         processed = len(images) - len(skipped)
         print(f"Total vehicles detected: {total} across {processed} images"
               + (f" ({len(skipped)} skipped)" if skipped else ""))
+        print(f"Saved {processed} masks to {MASKS_DIR}")
     if skipped:
         sys.exit(1)

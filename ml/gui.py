@@ -9,6 +9,7 @@ Serves the frontend in web/ and a small JSON API:
   GET  /api/image          serve an image file
   GET  /api/models         list available .pt weights
   POST /api/predict        run the detector on an image, returns detections as JSON
+                           (each has bbox [x1, y1, x2, y2], center [x, y], confidence, class_id, class_name)
   POST /api/jobs/{name}    start train.py / test.py
   GET  /api/jobs/{name}    poll a job's status and log output
   POST /api/jobs/{name}/stop
