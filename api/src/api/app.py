@@ -10,9 +10,8 @@ from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_credentials=True,
-    allow_methods=["GET, POST"],
-    allow_headers=["*"],
+    allow_methods=["GET","POST"],
+    allow_headers=["Content-Type"],
 )
 
 class Lot(BaseModel):
@@ -48,3 +47,13 @@ def lot_sections(lot_id: int, db: Client = Depends(get_db)):
 def lot_spots(lot_id: int, db: Client = Depends(get_db)):
     response = db.table("spots").select("*").eq("lot_id", lot_id).execute()
     return response.data
+
+@app.post("/spots", response_model=list[Spot])
+def upsert_spots(spots: list[Spot], db: Client = Depends(get_db)):
+    rows = [s.model_dump() for s in spots]
+    response = db.table("spots").upsert(rows, on_conflict="spot_id").execute()
+    if not response.data:
+        raise HTTPException(status_code=400, detail="Failed to update spots")
+    return response.data
+
+
