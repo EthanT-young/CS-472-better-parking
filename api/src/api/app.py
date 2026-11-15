@@ -2,8 +2,18 @@ from fastapi import FastAPI, Depends, HTTPException
 from api.db import get_db
 from supabase import Client
 from pydantic import BaseModel  
+from api.config import settings
 
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET, POST"],
+    allow_headers=["*"],
+)
 
 class Lot(BaseModel):
     lot_id: int
@@ -38,5 +48,3 @@ def lot_sections(lot_id: int, db: Client = Depends(get_db)):
 def lot_spots(lot_id: int, db: Client = Depends(get_db)):
     response = db.table("spots").select("*").eq("lot_id", lot_id).execute()
     return response.data
-
-
