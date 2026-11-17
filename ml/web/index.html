@@ -48,17 +48,39 @@
         <div class="actions">
           <button id="run-btn" class="primary">Run</button>
           <label><input id="auto-input" type="checkbox" checked> Auto-run</label>
-          <label><input id="boxes-input" type="checkbox" checked> Boxes</label>
-          <label><input id="centers-input" type="checkbox" checked> Centers</label>
+          <label><input id="boxes-input" type="checkbox"> Boxes</label>
+          <label><input id="centers-input" type="checkbox"> Centers</label>
           <button id="save-btn" disabled>Save annotated</button>
+          <button id="save-mask-btn" disabled>Save mask</button>
         </div>
       </div>
 
+      <div class="mask-toolbar">
+        <label>View <select id="mask-view"><option value="overlay" selected>Mask overlay</option><option value="photo">Photo</option><option value="binary">Binary mask</option></select></label>
+        <label><input id="spots-input" type="checkbox" checked> Spot points</label>
+        <span id="mask-status" class="muted" aria-live="polite">Run an image to see its mask.</span>
+      </div>
       <div id="stage" class="stage">
         <canvas id="canvas"></canvas>
         <div id="stage-message" class="stage-message">Select an image from the sidebar.</div>
       </div>
 
+      <section class="spot-panel" aria-label="Parking spot checks">
+        <div class="spot-controls">
+          <strong>Parking spots</strong>
+          <label>Spot number <input id="spot-number" type="number" min="1" step="1" value="1"></label>
+          <label><input id="place-spot" type="checkbox" checked> Click image to place point</label>
+          <button id="reset-spots" type="button">Reset to configured spots</button>
+        </div>
+        <p class="spot-help muted">Click a car or an empty space to test a point. Reusing a spot number moves its point. Edits are temporary; copy the list below into PARKING_SPOTS in predict.py to keep them. Use the same camera view and original image resolution.</p>
+        <div id="spot-list" class="spot-list" aria-live="polite"></div>
+        <details class="spot-code">
+          <summary>Coordinates for predict.py</summary>
+          <textarea id="spot-code" readonly aria-label="Parking spot Python code" spellcheck="false"></textarea>
+          <button id="copy-spots" type="button">Copy coordinates</button>
+          <span id="copy-status" class="muted" aria-live="polite"></span>
+        </details>
+      </section>
       <div class="results">
         <strong id="result-title">No image selected</strong>
         <span id="result-detail" class="muted"></span>

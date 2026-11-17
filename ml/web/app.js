@@ -42,6 +42,17 @@ const state = {
   image: null,      // loaded HTMLImageElement
   detections: null, // all detections for the current image, in image pixel coordinates
   requestId: 0,
+  imageId: 0,
+  folderId: 0,
+  maskId: 0,
+  maskTimer: null,
+  mask: null,
+  maskImage: null,
+  maskOverlay: null,
+  spots: [],
+  configuredSpots: [],
+  spotStatuses: null,
+  spotRevision: 0,
   runTimer: null,
   results: new Map(), // "model|path" -> detections, so revisiting an image doesn't rerun the model
 };
@@ -58,8 +69,19 @@ const ctx = canvas.getContext("2d");
 /* ---------- Predict: folder browsing ---------- */
 
 async function openFolder(path, { quiet = false } = {}) {
+  const id = ++state.folderId;
   try {
     const data = await api(`/api/browse?path=${encodeURIComponent(path)}`);
+    if (id !== state.folderId) return false;
+    if (state.folder !== data.path) {
+      invalidatePrediction();
+      state.imageId++;
+      state.selected = null;
+      state.image = null;
+      $("#stage-message").textContent = "Select an image from the sidebar.";
+      setResult("No image selected", "");
+      render();
+    }
     Object.assign(state, { folder: data.path, parent: data.parent, dirs: data.dirs, images: data.images });
     $("#path-input").value = data.path;
     storage.set("folder", data.path);
@@ -112,7 +134,7 @@ $("#filter-input").addEventListener("input", renderFileList);
 // Arrow keys move through the image list when not typing in a field
 document.addEventListener("keydown", (e) => {
   if (!$("#view-predict").classList.contains("active")) return;
-  if (e.target.matches("input:not([type=checkbox]):not([type=range]), select")) return;
+  if (e.target.matches("input:not([type=checkbox]):not([type=range]), select, textarea")) return;
   if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
   const images = visibleImages();
   if (!images.length) return;
@@ -128,27 +150,51 @@ function imagePath() {
   return joinPath(state.folder, state.selected);
 }
 
-function selectImage(name) {
-  clearTimeout(state.runTimer);
-  state.selected = name;
-  state.detections = null;
-  document.querySelectorAll("#file-list li[data-name]").forEach((li) => {
-    const isSelected = li.dataset.name === name;
-    li.classList.toggle("selected", isSelected);
-    if (isSelected) li.scrollIntoView({ block: "nearest" });
-  });
+function invalidateMask() {
+  clearTimeout(state.maskTimer);
+  state.maskId++;
+  state.mask = null;
+  state.maskImage = null;
+  state.maskOverlay = null;
+  state.spotStatuses = null;
+  $("#save-mask-btn").disabled = true;
   $("#save-btn").disabled = true;
-  setResult(name, "");
+  $("#mask-status").textContent = state.detections === null ? "Run an image to see its mask." : "Updating mask…";
+  renderSpots();
+}
+
+function invalidatePrediction() {
+  clearTimeout(state.runTimer);
+  state.requestId++;
+  state.detections = null;
+  $("#run-btn").disabled = false;
+  invalidateMask();
+}
+
+function selectImage(name) {
+  invalidatePrediction();
+  const id = ++state.imageId;
+  state.selected = name;
+  state.image = null;
+  renderFileList();
+  const selected = [...document.querySelectorAll("#file-list li[data-name]")].find((li) => li.dataset.name === name);
+  if (selected) selected.scrollIntoView({ block: "nearest" });
+  setResult(name, "Loading image…");
+  $("#stage-message").textContent = "Loading image…";
+  render();
 
   const img = new Image();
   img.onload = () => {
-    if (state.selected !== name) return;
+    if (id !== state.imageId) return;
     state.image = img;
     $("#stage-message").textContent = "";
+    setResult(name, `${img.naturalWidth} × ${img.naturalHeight} pixels`);
     render();
     if ($("#auto-input").checked) scheduleRun();
   };
-  img.onerror = () => { $("#stage-message").textContent = `Could not load ${name}`; };
+  img.onerror = () => {
+    if (id === state.imageId) $("#stage-message").textContent = `Could not load ${name}`;
+  };
   img.src = `/api/image?path=${encodeURIComponent(imagePath())}`;
 }
 
@@ -159,7 +205,7 @@ function selectedClasses() {
 function visibleDetections() {
   const classes = selectedClasses();
   const conf = Number($("#conf-input").value);
-  return state.detections.filter((d) => classes.includes(d.class_id) && d.confidence >= conf);
+  return (state.detections || []).filter((d) => classes.includes(d.class_id) && d.confidence >= conf);
 }
 
 function resultKey() {
@@ -178,7 +224,9 @@ function scheduleRun() {
 // Always runs the model, so the Run button also refreshes saved results
 async function runModel() {
   clearTimeout(state.runTimer);
-  if (!state.selected) return setResult("Select an image first", "");
+  if (!state.selected || !state.image) return setResult("Select a loaded image first", "");
+  invalidatePrediction();
+  render();
 
   // Only the latest request's response is shown (e.g. when arrowing through the list)
   const id = ++state.requestId;
@@ -199,7 +247,7 @@ async function runModel() {
     state.results.delete(key);
     state.results.set(key, data.detections);
     if (state.results.size > MAX_CACHED_RESULTS) state.results.delete(state.results.keys().next().value);
-    if (id !== state.requestId) return;
+    if (id !== state.requestId || key !== resultKey()) return;
     showDetections(data.detections);
   } catch (err) {
     if (id === state.requestId) setResult(name, `Error: ${err.message}`);
@@ -210,7 +258,6 @@ async function runModel() {
 
 function showDetections(detections) {
   state.detections = detections;
-  $("#save-btn").disabled = false;
   refilter();
 }
 
@@ -220,6 +267,7 @@ function refilter() {
     const shown = visibleDetections();
     setResult(`${state.selected} — ${shown.length} vehicle${shown.length === 1 ? "" : "s"} detected`, summarize(shown));
   }
+  refreshMask();
   render();
 }
 
@@ -239,6 +287,11 @@ $("#conf-input").addEventListener("input", (e) => {
   $("#conf-value").textContent = Number(e.target.value).toFixed(2);
   refilter();
 });
+$("#model-input").addEventListener("input", () => {
+  invalidatePrediction();
+  render();
+  if (state.selected) setResult(state.selected, "Model changed; run to update.");
+});
 $("#model-input").addEventListener("change", () => {
   if ($("#auto-input").checked && state.image) scheduleRun();
 });
@@ -251,10 +304,31 @@ $("#centers-input").addEventListener("change", render);
 // Draws the image plus overlays. `scale` maps image pixels to canvas pixels.
 function drawScene(context, scale, offsetX, offsetY) {
   const img = state.image;
-  context.drawImage(img, offsetX, offsetY, img.width * scale, img.height * scale);
-  if (state.detections && ($("#boxes-input").checked || $("#centers-input").checked)) {
-    drawDetections(context, scale, offsetX, offsetY);
+  const mode = $("#mask-view").value;
+  const w = img.width * scale, h = img.height * scale;
+  if (mode === "binary") {
+    context.fillStyle = "#161b22";
+    context.fillRect(offsetX, offsetY, w, h);
+    if (state.maskImage) {
+      context.save();
+      context.imageSmoothingEnabled = false;
+      context.drawImage(state.maskImage, offsetX, offsetY, w, h);
+      context.restore();
+    }
+  } else {
+    context.drawImage(img, offsetX, offsetY, w, h);
+    if (mode === "overlay" && state.maskOverlay) {
+      context.save();
+      context.globalCompositeOperation = "screen";
+      context.globalAlpha = 0.65;
+      context.drawImage(state.maskOverlay, offsetX, offsetY, w, h);
+      context.restore();
+    }
+    if (state.detections && ($("#boxes-input").checked || $("#centers-input").checked)) {
+      drawDetections(context, scale, offsetX, offsetY);
+    }
   }
+  if ($("#spots-input").checked) drawSpots(context, scale, offsetX, offsetY);
 }
 
 function drawDetections(context, scale, offsetX, offsetY) {
@@ -329,20 +403,212 @@ function render() {
 
 new ResizeObserver(render).observe(canvas);
 
-// Saves the annotated image at full resolution
+// Saves the current view at full resolution; raw mask download excludes all annotations.
 $("#save-btn").addEventListener("click", () => {
+  if (!state.image || !state.mask) return;
   const out = document.createElement("canvas");
   out.width = state.image.width;
   out.height = state.image.height;
+  const name = state.selected.replace(/\.[^.]+$/, "") + "_annotated.png";
   drawScene(out.getContext("2d"), 1, 0, 0);
   out.toBlob((blob) => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = state.selected.replace(/\.[^.]+$/, "") + "_annotated.png";
-    a.click();
-    URL.revokeObjectURL(a.href);
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    download(url, name);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }, "image/png");
 });
+
+function download(url, name) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+}
+
+$("#save-mask-btn").addEventListener("click", () => {
+  if (state.mask) download(state.mask, state.selected.replace(/\.[^.]+$/, "") + "_mask.png");
+});
+
+/* ---------- Binary masks and parking spots ---------- */
+
+function refreshMask() {
+  invalidateMask();
+  if (!state.image || state.detections === null) return;
+  const id = state.maskId;
+  state.maskTimer = setTimeout(async () => {
+    try {
+      const data = await api("/api/mask", {
+        method: "POST",
+        body: {
+          width: state.image.naturalWidth,
+          height: state.image.naturalHeight,
+          detections: visibleDetections(),
+          spots: state.spots,
+        },
+      });
+      if (id !== state.maskId) return;
+      const img = new Image();
+      img.onload = () => {
+        if (id !== state.maskId) return;
+        state.mask = data.mask;
+        state.maskImage = img;
+        state.spotStatuses = data.spots;
+        const overlay = document.createElement("canvas");
+        overlay.width = img.width;
+        overlay.height = img.height;
+        const c = overlay.getContext("2d");
+        c.drawImage(img, 0, 0);
+        c.globalCompositeOperation = "multiply";
+        c.fillStyle = "#00bfff";
+        c.fillRect(0, 0, overlay.width, overlay.height);
+        state.maskOverlay = overlay;
+        $("#mask-status").textContent = `${data.width} × ${data.height} mask · white = inside a vehicle box`;
+        $("#save-mask-btn").disabled = false;
+        $("#save-btn").disabled = false;
+        renderSpots();
+        render();
+      };
+      img.onerror = () => {
+        if (id === state.maskId) $("#mask-status").textContent = "Could not display the mask. Run again to retry.";
+      };
+      img.src = data.mask;
+    } catch (err) {
+      if (id === state.maskId) $("#mask-status").textContent = `Mask error: ${err.message}`;
+    }
+  }, 120);
+}
+
+function statusFor(spot) {
+  if (!state.spotStatuses) return {label: "Pending", kind: "pending", color: "#94a3b8"};
+  const status = state.spotStatuses.find((s) => s.spot_number === spot.spot_number);
+  if (!status || status.occupied === null) return {label: "Unknown (outside image)", kind: "unknown", color: "#94a3b8"};
+  return status.occupied ? {label: "Occupied", kind: "occupied", color: "#ef4444"}
+    : {label: "Empty", kind: "empty", color: "#16a34a"};
+}
+
+function renderSpots() {
+  const list = $("#spot-list");
+  list.replaceChildren();
+  if (!state.spots.length) {
+    const empty = document.createElement("span");
+    empty.className = "muted";
+    empty.textContent = "No points yet. Choose a spot number and click the image.";
+    list.appendChild(empty);
+  }
+  for (const spot of state.spots) {
+    const row = document.createElement("div");
+    row.className = "spot-row";
+    const text = document.createElement("span");
+    text.textContent = `Spot ${spot.spot_number} · (${spot.coordinate.join(", ")})`;
+    const status = statusFor(spot);
+    const badge = document.createElement("span");
+    badge.className = `spot-state ${status.kind}`;
+    badge.textContent = status.label;
+    const remove = document.createElement("button");
+    remove.textContent = "Remove";
+    remove.setAttribute("aria-label", `Remove spot ${spot.spot_number}`);
+    remove.addEventListener("click", () => {
+      state.spots = state.spots.filter((s) => s.spot_number !== spot.spot_number);
+      state.spotRevision++;
+      $("#copy-status").textContent = "";
+      refreshMask();
+      render();
+    });
+    row.append(text, badge, remove);
+    list.appendChild(row);
+  }
+  $("#spot-code").value = "PARKING_SPOTS = [\n" + state.spots.map((s) =>
+    `    ParkingSpot(spot_number=${s.spot_number}, coordinate=(${s.coordinate[0]}, ${s.coordinate[1]})),`
+  ).join("\n") + "\n]";
+}
+
+function drawSpots(context, scale, offsetX, offsetY) {
+  const fontSize = Math.max(12, Math.round(16 * scale * Math.max(1, state.image.width / 1000)));
+  context.font = `600 ${fontSize}px system-ui, sans-serif`;
+  context.textBaseline = "top";
+  for (const spot of state.spots) {
+    const [px, py] = spot.coordinate;
+    if (px < 0 || py < 0 || px >= state.image.width || py >= state.image.height) continue;
+    const status = statusFor(spot);
+    const x = offsetX + px * scale, y = offsetY + py * scale;
+    const radius = Math.max(5, fontSize / 3);
+    context.beginPath();
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.fillStyle = status.color;
+    context.fill();
+    context.lineWidth = 2;
+    context.strokeStyle = "white";
+    context.stroke();
+    const text = `Spot ${spot.spot_number}: ${status.label}`;
+    const width = context.measureText(text).width + 8;
+    const tx = Math.max(offsetX, Math.min(x + radius + 5, offsetX + state.image.width * scale - width));
+    const ty = Math.max(offsetY, y - fontSize - radius - 7);
+    context.fillStyle = "rgba(0,0,0,0.8)";
+    context.fillRect(tx, ty, width, fontSize + 6);
+    context.fillStyle = status.color;
+    context.fillText(text, tx + 4, ty + 3);
+  }
+}
+
+canvas.addEventListener("click", (event) => {
+  if (!state.image || !$("#place-spot").checked) return;
+  const field = $("#spot-number");
+  const number = Number(field.value);
+  if (!field.reportValidity() || !Number.isSafeInteger(number) || number < 1) return;
+  const rect = canvas.getBoundingClientRect();
+  const scale = Math.min(rect.width / state.image.width, rect.height / state.image.height);
+  if (scale <= 0) return;
+  const x = Math.floor((event.clientX - rect.left - (rect.width - state.image.width * scale) / 2) / scale);
+  const y = Math.floor((event.clientY - rect.top - (rect.height - state.image.height * scale) / 2) / scale);
+  if (x < 0 || y < 0 || x >= state.image.width || y >= state.image.height) return;
+  const spot = {spot_number: number, coordinate: [x, y]};
+  const i = state.spots.findIndex((s) => s.spot_number === number);
+  if (i >= 0) state.spots[i] = spot;
+  else state.spots.push(spot);
+  state.spots.sort((a, b) => a.spot_number - b.spot_number);
+  state.spotRevision++;
+  $("#copy-status").textContent = "";
+  refreshMask();
+  render();
+});
+
+$("#reset-spots").addEventListener("click", () => {
+  state.spots = state.configuredSpots.map((s) => ({...s, coordinate: [...s.coordinate]}));
+  state.spotRevision++;
+  $("#copy-status").textContent = "";
+  refreshMask();
+  render();
+});
+$("#copy-spots").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("#spot-code").value);
+    $("#copy-status").textContent = "Copied. Paste into PARKING_SPOTS in predict.py.";
+  } catch {
+    $("#spot-code").focus();
+    $("#spot-code").select();
+    $("#copy-status").textContent = "Text selected. Copy it with your keyboard.";
+  }
+});
+$("#mask-view").addEventListener("change", render);
+$("#spots-input").addEventListener("change", render);
+$("#place-spot").addEventListener("change", () => $("#stage").classList.toggle("placing", $("#place-spot").checked));
+$("#stage").classList.toggle("placing", $("#place-spot").checked);
+
+async function loadSpots() {
+  try {
+    const data = await api("/api/spots");
+    state.configuredSpots = data.spots;
+    if (state.spotRevision === 0) {
+      state.spots = data.spots.map((s) => ({...s, coordinate: [...s.coordinate]}));
+      refreshMask();
+      render();
+    }
+  } catch (err) {
+    $("#copy-status").textContent = `Could not load configured spots: ${err.message}`;
+  }
+  renderSpots();
+}
 
 /* ---------- Train / Test jobs ---------- */
 
@@ -421,6 +687,8 @@ async function loadModels() {
 }
 
 loadModels();
+loadSpots();
+renderSpots();
 (async () => {
   const last = storage.get("folder");
   if (!last || !(await openFolder(last, { quiet: true }))) openFolder(".");

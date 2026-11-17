@@ -187,3 +187,39 @@ nav { display: flex; }
   color: var(--log-text);
   font: 12px/1.45 ui-monospace, "Cascadia Mono", monospace;
 }
+
+/* Binary masks and editable parking spot previews */
+.actions { flex-wrap: wrap; }
+.mask-toolbar, .spot-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; }
+.mask-toolbar { padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--border); }
+.mask-toolbar label, .spot-controls label { display: inline-flex; align-items: center; gap: 6px; }
+.predict-main { overflow-y: auto; }
+.stage { min-height: 320px; }
+.stage.placing canvas { cursor: crosshair; }
+.spot-panel { padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--border); max-height: 270px; overflow: auto; flex-shrink: 0; }
+.spot-controls input[type=number] { width: 78px; }
+.spot-help { font-size: 12px; margin: 8px 0; }
+.spot-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.spot-row { display: inline-flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; }
+.spot-row button { padding: 1px 5px; font-size: 12px; }
+.spot-state { font-weight: 600; }
+.spot-state.occupied { color: #ef4444; }
+.spot-state.empty { color: #16a34a; }
+.spot-state.unknown, .spot-state.pending { color: var(--muted); }
+.spot-code { margin-top: 8px; }
+.spot-code summary { cursor: pointer; color: var(--accent); font-size: 12px; }
+.spot-code textarea { display: block; margin: 8px 0; width: 100%; min-height: 90px; resize: vertical; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); padding: 8px; font: 12px/1.5 ui-monospace, monospace; }
+.results { flex-wrap: wrap; }
+@media (max-width: 900px) {
+  .sidebar { width: 180px; }
+  .toolbar { gap: 8px 12px; }
+  .classes { flex-wrap: wrap; }
+}
+@media (max-width: 650px) {
+  body { height: auto; min-height: 100%; }
+  #view-predict.active { flex-direction: column; }
+  .sidebar { width: 100%; height: 180px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .stage { flex: none; height: 350px; }
+  .spot-panel { max-height: none; }
+  .toolbar, .mask-toolbar, .spot-panel { padding-left: 10px; padding-right: 10px; }
+}
