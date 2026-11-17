@@ -23,25 +23,101 @@ type StallPanelProps = {
   highContrast: boolean;
 };
 
+// Swatches match the map's stall styles in components/map/StallMap.tsx.
 function Legend({ highContrast }: { highContrast: boolean }) {
-  const open = highContrast ? "bg-yellow-400 border-black border-2" : "bg-emerald-500 border-emerald-700";
+  const open = highContrast
+    ? "bg-yellow-400 border-black border-2"
+    : "bg-emerald-600 border-emerald-950";
   const taken = highContrast ? "stall-swatch-taken-hc" : "stall-swatch-taken";
 
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-700">
       <li className="flex items-center gap-1.5">
-        <span className={`h-3.5 w-3.5 rounded-sm border ${open}`} />
+        <span aria-hidden="true" className={`h-3.5 w-3.5 rounded-sm border ${open}`} />
         Open
       </li>
       <li className="flex items-center gap-1.5">
-        <span className={`h-3.5 w-3.5 rounded-sm border border-slate-700 ${taken}`} />
+        <span
+          aria-hidden="true"
+          className={`h-3.5 w-3.5 rounded-sm border border-slate-700 ${taken}`}
+        />
         Taken
       </li>
       <li className="flex items-center gap-1.5">
-        <span className="h-3.5 w-3.5 rounded-sm border border-dashed border-slate-400 bg-white" />
+        <span
+          aria-hidden="true"
+          className="h-3.5 w-3.5 rounded-sm border border-dashed border-slate-500 bg-white"
+        />
         Not your permit
       </li>
     </ul>
+  );
+}
+
+// The map's stalls are mouse/touch targets only, so the same choices are offered here as
+// buttons. That covers keyboard use (WCAG 2.1.1) and the tiny map targets (2.5.8).
+function OpenStallList({
+  level,
+  stalls,
+  permit,
+  selectedId,
+  onSelect,
+}: {
+  level: Level;
+  stalls: Record<string, StallStatus>;
+  permit: Permit;
+  selectedId: string | null;
+  onSelect: (stall: Stall) => void;
+}) {
+  const rows = new Map<string, Stall[]>();
+  for (const stall of level.stalls ?? []) {
+    if (stalls[stall.id] !== "open" || !canPark(permit, stall.type)) continue;
+    rows.set(stall.strip, [...(rows.get(stall.strip) ?? []), stall]);
+  }
+  const sorted = [...rows.entries()].sort(([a], [b]) =>
+    a.localeCompare(b, undefined, { numeric: true })
+  );
+  const count = sorted.reduce((sum, [, row]) => sum + row.length, 0);
+
+  return (
+    <details className="mt-3 rounded-xl border border-slate-300 bg-white">
+      <summary className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold text-slate-900">
+        List open stalls you can use ({count})
+      </summary>
+
+      {count === 0 ? (
+        <p className="px-3 pb-3 text-sm text-slate-600">None on this level right now.</p>
+      ) : (
+        <div className="max-h-72 space-y-3 overflow-y-auto px-3 pb-3">
+          {sorted.map(([strip, row]) => (
+            <div key={strip} role="group" aria-labelledby={`row-${level.id}-${strip}`}>
+              <p
+                id={`row-${level.id}-${strip}`}
+                className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-600"
+              >
+                Row {strip}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {row.map((stall) => (
+                  <button
+                    key={stall.id}
+                    type="button"
+                    onClick={() => onSelect(stall)}
+                    aria-pressed={stall.id === selectedId}
+                    className="min-h-8 min-w-8 rounded-md border border-slate-500 px-2 text-xs font-semibold text-slate-900 hover:bg-slate-100 aria-pressed:border-slate-900 aria-pressed:bg-slate-900 aria-pressed:text-white"
+                  >
+                    {stall.id}
+                    {stall.type !== "Student" && (
+                      <span className="font-normal"> · {stall.type}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </details>
   );
 }
 
@@ -57,16 +133,16 @@ function CountsOnly({ garage, counts }: { garage: Garage; counts: LevelCounts | 
       <p className="text-sm font-semibold text-slate-900">
         Stall-by-stall map coming soon for {garage.shortName}.
       </p>
-      <p className="mt-1 text-sm text-slate-500">Open spots on this level by type:</p>
+      <p className="mt-1 text-sm text-slate-600">Open spots on this level by type:</p>
 
       <dl className="mt-3 divide-y divide-slate-200 text-sm">
         {rows.map(([label, key]) =>
           counts && counts[key].total > 0 ? (
             <div key={key} className="flex justify-between py-2">
-              <dt className="text-slate-600">{label}</dt>
+              <dt className="text-slate-700">{label}</dt>
               <dd className="font-bold tabular-nums text-slate-900">
                 {counts[key].open}{" "}
-                <span className="font-normal text-slate-500">/ {counts[key].total}</span>
+                <span className="font-normal text-slate-600">/ {counts[key].total}</span>
               </dd>
             </div>
           ) : null
@@ -146,16 +222,26 @@ export default function StallPanel({
               {stalls[selectedHere.id] === "open" ? "Open" : "Taken"}
             </span>
             <br />
-            <span className="text-slate-500">
+            <span className="text-slate-600">
               {canPark(permit, selectedHere.type)
                 ? "You can park here."
                 : `Not available with a ${permitLabels[permit]} permit.`}
             </span>
           </p>
         ) : (
-          <p className="text-slate-500">Tap a stall to see its type and status.</p>
+          <p className="text-slate-600">
+            Tap a stall on the map, or pick one from the list below, to see its type and status.
+          </p>
         )}
       </div>
+
+      <OpenStallList
+        level={level}
+        stalls={stalls}
+        permit={permit}
+        selectedId={selectedHere?.id ?? null}
+        onSelect={setSelected}
+      />
     </section>
   );
 }

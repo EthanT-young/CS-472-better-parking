@@ -4,6 +4,8 @@ import L from "leaflet";
 import { ImageOverlay, MapContainer, Polygon } from "react-leaflet";
 
 import { canPark } from "@/lib/permits";
+
+import { labelMap } from "./labelMap";
 import type { Level, Permit, Stall, StallStatus } from "@/types/parking";
 
 export type StallMapProps = {
@@ -18,6 +20,9 @@ export type StallMapProps = {
 };
 
 // Two states only (open / taken); patterns carry the meaning as well as color.
+// Every edge and fill is at least 3:1 against the map background (WCAG 1.4.11):
+// open is emerald-600 (3.5:1) inside a near-black border, taken is slate-500 with white
+// stripes, and stalls outside your permit have a slate-500 dashed edge (4.5:1).
 function stallStyle(
   status: StallStatus,
   eligible: boolean,
@@ -26,7 +31,7 @@ function stallStyle(
 ): L.PathOptions {
   if (!eligible) {
     return {
-      color: highContrast ? "#000000" : "#94a3b8",
+      color: highContrast ? "#000000" : "#62748e",
       weight: 0.75,
       dashArray: "2 3",
       fillColor: "#ffffff",
@@ -37,7 +42,7 @@ function stallStyle(
   const base: L.PathOptions =
     status === "open"
       ? {
-          color: highContrast ? "#000000" : "#047857",
+          color: highContrast ? "#000000" : "#002c22",
           weight: highContrast ? 2 : 1,
           fillColor: highContrast ? "url(#stall-open-hc)" : "url(#stall-open)",
           fillOpacity: 1,
@@ -49,10 +54,16 @@ function stallStyle(
           fillOpacity: 1,
         };
 
-  return selected
-    ? { ...base, color: "#dc2626", weight: 3 }
-    : base;
+  // Black outline over a white halo (drawn separately): visible on any fill, and not red vs green.
+  return selected ? { ...base, color: "#000000", weight: 3 } : base;
 }
+
+const selectedHalo: L.PathOptions = {
+  color: "#ffffff",
+  weight: 7,
+  fill: false,
+  interactive: false,
+};
 
 export default function StallMap({
   garageId,
@@ -75,8 +86,37 @@ export default function StallMap({
     return [height - (y - minY), x - minX];
   }
 
+  function stallPolygon(stall: Stall) {
+    const status = stalls[stall.id] ?? "taken";
+    const eligible = canPark(permit, stall.type);
+
+    return (
+      <Polygon
+        key={stall.id}
+        positions={stall.points.map(toMapPoint)}
+        pathOptions={stallStyle(
+          status,
+          eligible,
+          stall.id === selectedStallId,
+          highContrast
+        )}
+        eventHandlers={{ click: () => onSelectStall(stall) }}
+      />
+    );
+  }
+
+  // The selected stall is drawn last so its outline isn't covered by its neighbours.
+  const selectedStall = level.stalls?.find((stall) => stall.id === selectedStallId);
+
   return (
     <MapContainer
+      ref={(map) =>
+        labelMap(
+          map,
+          `Stall map, ${level.name}. Use arrow keys to pan and plus or minus to zoom. ` +
+            "Open stalls are also listed below the map."
+        )
+      }
       key={`${garageId}:${level.id}`}
       crs={L.CRS.Simple}
       bounds={bounds}
@@ -99,24 +139,20 @@ export default function StallMap({
         />
       )}
 
-      {level.stalls?.map((stall) => {
-        const status = stalls[stall.id] ?? "taken";
-        const eligible = canPark(permit, stall.type);
+      {level.stalls
+        ?.filter((stall) => stall.id !== selectedStallId)
+        .map(stallPolygon)}
 
-        return (
+      {selectedStall && (
+        <>
           <Polygon
-            key={stall.id}
-            positions={stall.points.map(toMapPoint)}
-            pathOptions={stallStyle(
-              status,
-              eligible,
-              stall.id === selectedStallId,
-              highContrast
-            )}
-            eventHandlers={{ click: () => onSelectStall(stall) }}
+            key={`${selectedStall.id}:halo`}
+            positions={selectedStall.points.map(toMapPoint)}
+            pathOptions={selectedHalo}
           />
-        );
-      })}
+          {stallPolygon(selectedStall)}
+        </>
+      )}
     </MapContainer>
   );
 }

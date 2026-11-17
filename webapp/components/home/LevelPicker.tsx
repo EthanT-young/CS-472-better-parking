@@ -27,7 +27,7 @@ export default function LevelPicker({
 
   return (
     <div>
-      <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+      <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">
         Pick a level
       </h2>
 
@@ -37,19 +37,20 @@ export default function LevelPicker({
           const status = availability(open, total);
           const best = mostOpen?.level.id === level.id && open > 0 && options.length > 1;
 
+          // The accessible name is built from the visible text plus screen-reader-only
+          // detail, so it starts with what's on screen ("L1"), as WCAG 2.5.3 requires.
           return (
             <button
               key={level.id}
               type="button"
               onClick={() => onSelect(level.id)}
               aria-pressed={level.id === selectedLevelId}
-              aria-label={`${level.name}: ${open} of ${total} open, ${status.label}${best ? ", most open" : ""}`}
-              className="relative flex min-h-20 flex-col rounded-xl border-2 border-slate-200 bg-white p-2.5 text-left transition hover:border-slate-300 aria-pressed:border-slate-900 aria-pressed:bg-slate-900 aria-pressed:text-white"
+              className="relative flex min-h-20 flex-col rounded-xl border-2 border-slate-200 bg-white p-2.5 text-left transition hover:border-slate-400 aria-pressed:border-slate-900 aria-pressed:bg-slate-900 aria-pressed:text-white"
             >
-              <span className="text-xs font-semibold opacity-80">
+              <span className="text-xs font-semibold">
                 {level.name.replace("Level ", "L")}
                 {best && (
-                  <span className="ml-1 rounded bg-emerald-600 px-1 py-px text-[10px] font-bold uppercase text-white">
+                  <span className="ml-1 rounded bg-emerald-700 px-1 py-px text-[10px] font-bold uppercase text-white">
                     Most open
                   </span>
                 )}
@@ -60,8 +61,15 @@ export default function LevelPicker({
                 }`}
               >
                 {open}
+                <span className="sr-only">
+                  {" "}
+                  of {total} open, {status.label}
+                </span>
               </span>
-              <span className="mt-auto h-1.5 overflow-hidden rounded-full bg-slate-200">
+              <span
+                aria-hidden="true"
+                className="mt-auto h-1.5 overflow-hidden rounded-full bg-slate-200"
+              >
                 <span
                   className={`block h-full ${barClasses[status.tone]}`}
                   style={{ width: `${percentFull(open, total)}%` }}

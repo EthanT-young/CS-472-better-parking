@@ -22,7 +22,7 @@ export default function GarageCards({
 }: GarageCardsProps) {
   return (
     <div>
-      <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+      <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">
         Where to park
       </h2>
 
@@ -49,7 +49,7 @@ export default function GarageCards({
                 >
                   {open}
                 </span>
-                <span className="block text-xs text-slate-500">open for you</span>
+                <span className="block text-xs text-slate-600">open for you</span>
               </span>
 
               <span

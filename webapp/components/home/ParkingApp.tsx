@@ -57,6 +57,10 @@ export default function ParkingApp() {
   const [highContrast, setHighContrast] = useState(false);
   const [garageId, setGarageId] = useState(garages[0].id);
   const [levelId, setLevelId] = useState(() => bestLevel(garages[0], "student").id);
+  // A live feed starts empty, so the opening level is picked again once data arrives,
+  // unless the user has already chosen one.
+  const [hadData, setHadData] = useState(live.updatedAt !== null);
+  const [userPickedLevel, setUserPickedLevel] = useState(false);
 
   // Restore remembered choices after hydration so server and client markup match.
   useEffect(() => {
@@ -84,6 +88,12 @@ export default function ParkingApp() {
   }
 
   const garage = garages.find((item) => item.id === garageId) ?? garages[0];
+
+  if (!hadData && live.updatedAt !== null) {
+    setHadData(true);
+    if (!userPickedLevel) setLevelId(bestLevel(garage, permit).id);
+  }
+
   const level = garage.levels.find((item) => item.id === levelId) ?? garage.levels[0];
 
   function selectGarage(nextGarageId: string) {
@@ -129,10 +139,20 @@ export default function ParkingApp() {
 
   return (
     <div className={`flex min-h-full flex-col bg-slate-100 ${highContrast ? "high-contrast" : ""}`}>
+      <a
+        href="#main"
+        className="sr-only z-[1200] rounded-lg bg-blue-700 px-4 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to main content
+      </a>
       <StallPatterns />
       <Header highContrast={highContrast} onToggleContrast={toggleContrast} />
 
-      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:py-6">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto grid w-full max-w-7xl flex-1 gap-4 px-4 py-4 focus:outline-none sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:py-6"
+      >
         <div className="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-start-1">
           <EventBanner />
           <PermitSwitch value={permit} onChange={changePermit} />
@@ -160,7 +180,10 @@ export default function ParkingApp() {
             <LevelPicker
               options={levelOptions}
               selectedLevelId={level.id}
-              onSelect={setLevelId}
+              onSelect={(nextLevelId) => {
+                setUserPickedLevel(true);
+                setLevelId(nextLevelId);
+              }}
             />
           )}
           <StallPanel
@@ -177,7 +200,7 @@ export default function ParkingApp() {
           aria-label="Campus map"
           className="min-w-0 lg:col-start-1 lg:row-start-2"
         >
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">
             Campus map
           </h2>
           <div className="h-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:h-80">

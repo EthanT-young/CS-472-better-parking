@@ -12,10 +12,52 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  /* Keeps focused elements clear of the sticky header (WCAG 2.4.11). */
+  scroll-padding-top: 5rem;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* One visible focus ring everywhere (WCAG 2.4.7). It sits outside the control, so it
+   only has to contrast with the page: 6:1 or better on white and slate-100. */
+:focus-visible {
+  outline: 3px solid #1447e6; /* blue-700 */
+  outline-offset: 2px;
+}
+
+.site-header :focus-visible {
+  outline-color: #ffdf20; /* yellow-300, 15:1 on the dark header */
+}
+
+/* The map boxes clip anything outside them, so draw their ring inside. */
+.leaflet-container:focus-visible {
+  outline-offset: -3px;
+}
+
+/* Leaflet's marker wrapper is 0x0 (the pin is drawn by its child), so ring the pin itself. */
+.leaflet-marker-icon:focus-visible {
+  outline: none;
+}
+
+.leaflet-marker-icon:focus-visible .campus-pin {
+  outline: 3px solid #1447e6;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Stall map: mute the floor plan's zone colors so only open / taken stand out. */
@@ -36,7 +78,7 @@ body {
 }
 
 .stall-swatch-taken {
-  background: repeating-linear-gradient(45deg, #64748b 0 3px, #e2e8f0 3px 4.5px);
+  background: repeating-linear-gradient(45deg, #64748b 0 3px, #ffffff 3px 4.5px);
 }
 
 .stall-swatch-taken-hc {
@@ -86,9 +128,10 @@ body {
 .campus-pin-bad .campus-pin-count { background: #b91c1c; }
 .campus-pin-none .campus-pin-count { background: #64748b; }
 
+/* Selected: a thicker, darker red border plus a white halo, so it doesn't rely on hue alone. */
 .campus-pin-selected {
-  border-color: #dc2626;
-  outline: 3px solid rgb(220 38 38 / 0.3);
+  border: 3px solid #b91c1c;
+  box-shadow: 0 0 0 3px #fff, 0 2px 8px rgb(15 23 42 / 0.4);
   z-index: 1;
 }
 

@@ -6,6 +6,8 @@ import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import type { Availability } from "@/lib/permits";
 import type { Garage } from "@/types/parking";
 
+import { labelMap } from "./labelMap";
+
 export type CampusPin = {
   garage: Garage;
   open: number;
@@ -29,6 +31,8 @@ function escapeHtml(text: string) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 }
 
+// The count's color shows availability; the hidden text says it too, so it isn't color-only
+// (WCAG 1.4.1), and names the selected garage for screen readers.
 function pinIcon(pin: CampusPin, selected: boolean) {
   return L.divIcon({
     className: "",
@@ -40,6 +44,9 @@ function pinIcon(pin: CampusPin, selected: boolean) {
     }">
       <span class="campus-pin-count">${pin.open}</span>
       <span class="campus-pin-name">${escapeHtml(pin.garage.shortName)}</span>
+      <span class="sr-only">open for you, ${pin.availability.label}${
+        selected ? ", selected" : ""
+      }</span>
     </div>`,
   });
 }
@@ -51,6 +58,7 @@ export default function CampusMap({
 }: CampusMapProps) {
   return (
     <MapContainer
+      ref={(map) => labelMap(map, "Campus map. Use arrow keys to pan and plus or minus to zoom.")}
       bounds={L.latLngBounds(pins.map((pin) => pin.garage.location))}
       boundsOptions={{ padding: [60, 50] }}
       minZoom={14}
@@ -69,7 +77,7 @@ export default function CampusMap({
           key={pin.garage.id}
           position={pin.garage.location}
           icon={pinIcon(pin, pin.garage.id === selectedGarageId)}
-          title={`${pin.garage.name}: ${pin.open} open for you`}
+          title={`${pin.garage.name}: ${pin.open} open for you, ${pin.availability.label}`}
           eventHandlers={{ click: () => onSelectGarage(pin.garage.id) }}
         />
       ))}

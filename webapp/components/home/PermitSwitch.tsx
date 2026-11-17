@@ -11,7 +11,7 @@ const permits: Permit[] = ["student", "staff", "all"];
 export default function PermitSwitch({ value, onChange }: PermitSwitchProps) {
   return (
     <fieldset>
-      <legend className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+      <legend className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">
         I park as
       </legend>
 
@@ -22,7 +22,7 @@ export default function PermitSwitch({ value, onChange }: PermitSwitchProps) {
             type="button"
             onClick={() => onChange(permit)}
             aria-pressed={value === permit}
-            className="min-h-11 rounded-lg text-sm font-semibold text-slate-600 transition aria-pressed:bg-white aria-pressed:text-slate-950 aria-pressed:shadow-sm"
+            className="min-h-11 rounded-lg text-sm font-semibold text-slate-700 transition hover:bg-white/70 aria-pressed:bg-slate-900 aria-pressed:text-white aria-pressed:shadow-sm"
           >
             {permitLabels[permit]}
           </button>

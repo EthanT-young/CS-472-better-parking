@@ -65,7 +65,7 @@ export default function GarageSummary({
             {status.label}
           </span>
           <p className="mt-1 text-2xl font-extrabold tabular-nums text-slate-900">
-            {full}% <span className="text-sm font-semibold text-slate-500">full</span>
+            {full}% <span className="text-sm font-semibold text-slate-600">full</span>
           </p>
         </div>
       </div>
@@ -76,20 +76,20 @@ export default function GarageSummary({
         aria-label={`${full}% full`}
       >
         <div
-          className={`h-full rounded-full transition-all duration-700 ${barClasses[status.tone]}`}
+          className={`h-full rounded-full motion-safe:transition-all motion-safe:duration-700 ${barClasses[status.tone]}`}
           style={{ width: `${full}%` }}
         />
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div className="rounded-xl bg-slate-50 p-3">
-          <dt className="text-xs font-semibold text-slate-500">Cars in {garage.kind === "lot" ? "lots" : "garage"}</dt>
+          <dt className="text-xs font-semibold text-slate-600">Cars in {garage.kind === "lot" ? "lots" : "garage"}</dt>
           <dd className="mt-0.5 text-xl font-bold tabular-nums text-slate-900">
             {carsInGarage.toLocaleString()}
           </dd>
         </div>
         <div className="rounded-xl bg-slate-50 p-3">
-          <dt className="text-xs font-semibold text-slate-500">Fill rate, last minute</dt>
+          <dt className="text-xs font-semibold text-slate-600">Fill rate, last minute</dt>
           <dd className="mt-0.5 text-xl font-bold tabular-nums text-slate-900">
             {fillRateText(carsLastMinute)}
           </dd>

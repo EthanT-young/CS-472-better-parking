@@ -3,9 +3,11 @@
 Usage: python3 trace_floorplan.py <screenshots_dir> <out_dir> [stall_width_px]
 
 Expects l1.png ... l4.png (one per level, same framing). Stall rows are found by
-their legend color, split into stalls of stall_width_px, and written in the same
-format as data/garage-stalls-CG.json. OVERLAYS, ANGLE and CROP are tuned to the
-Tropicana screenshots (map pin / icons to paint over, rotation, garage bounds).
+their legend color, split into stalls of stall_width_px, and written in the older
+traced format (viewBox + levels). After copying the JSON into data/, run
+`node scripts/sync_spaces.mjs` to convert it to the table-shaped format the app reads
+and to give the spaces their space_id / camera_id. OVERLAYS, ANGLE and CROP are tuned
+to the Tropicana screenshots (map pin / icons to paint over, rotation, garage bounds).
 
 Needs: pip install numpy opencv-python-headless
 """

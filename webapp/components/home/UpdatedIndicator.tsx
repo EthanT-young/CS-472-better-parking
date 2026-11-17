@@ -8,7 +8,8 @@ type UpdatedIndicatorProps = {
   updatedAt: number | null;
 };
 
-// The "last updated" trust signal: green and pulsing while fresh, amber once stale.
+// The "last updated" trust signal: green while fresh, amber once stale. The dot doesn't
+// pulse: a never-ending animation would need a pause control (WCAG 2.2.2).
 export default function UpdatedIndicator({ updatedAt }: UpdatedIndicatorProps) {
   const [now, setNow] = useState<number | null>(null);
 
@@ -23,7 +24,7 @@ export default function UpdatedIndicator({ updatedAt }: UpdatedIndicatorProps) {
   }, []);
 
   if (updatedAt === null || now === null) {
-    return <span className="text-xs text-slate-500">Connecting…</span>;
+    return <span className="text-xs text-slate-600">Connecting…</span>;
   }
 
   const seconds = Math.max(0, Math.round((now - updatedAt) / 1000));
@@ -38,19 +39,15 @@ export default function UpdatedIndicator({ updatedAt }: UpdatedIndicatorProps) {
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold ${
-        stale ? "bg-amber-100 text-amber-900" : "bg-emerald-50 text-emerald-800"
+        stale ? "bg-amber-100 text-black" : "bg-emerald-100 text-black"
       }`}
     >
-      <span className="relative flex h-2.5 w-2.5">
-        {!stale && (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-        )}
-        <span
-          className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
-            stale ? "bg-amber-500" : "bg-emerald-500"
-          }`}
-        />
-      </span>
+      <span
+        aria-hidden="true"
+        className={`inline-flex h-2.5 w-2.5 rounded-full ${
+          stale ? "bg-amber-700" : "bg-emerald-600"
+        }`}
+      />
       {stale ? `Not updated for ${age.replace(" ago", "")}` : `Updated ${age}`}
     </span>
   );
