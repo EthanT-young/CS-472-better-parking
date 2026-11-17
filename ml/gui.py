@@ -9,15 +9,15 @@ Serves the frontend in web/ and a small JSON API:
   GET  /api/image          serve an image file
   GET  /api/models         list available .pt weights
   POST /api/predict        run the detector on an image, returns detections as JSON
-                           (each has bbox [x1, y1, x2, y2], center [x, y], confidence, class_id, class_name)
+                           (each has bbox [x1, y1, x2, y2], bottom_center [x, y], confidence, class_id, class_name)
   GET  /api/spots          fixed spot numbers and coordinates from predict.py
-  POST /api/mask           build a binary PNG and check spots using filtered detection boxes
+  POST /api/spots/check    check spot points against the filtered detection boxes
   POST /api/jobs/{name}    start train.py / test.py
   GET  /api/jobs/{name}    poll a job's status and log output
   POST /api/jobs/{name}/stop
 """
 
-import base64
+# import base64  # only the commented-out /api/mask endpoint used it
 import os
 import signal
 import subprocess
@@ -122,9 +122,10 @@ class DetectionBox(BaseModel):
     bbox: tuple[int, int, int, int]
 
 
-class MaskRequest(BaseModel):
-    width: int = Field(gt=0, le=16384)
-    height: int = Field(gt=0, le=16384)
+class SpotCheckRequest(BaseModel):
+    # Original image size, so points outside the image come back as unknown (None)
+    width: int = Field(gt=0)
+    height: int = Field(gt=0)
     detections: list[DetectionBox] = Field(default_factory=list)
     # Omission uses predict.py's configuration; [] explicitly checks no spots.
     spots: list[SpotCoordinate] | None = None
@@ -140,36 +141,63 @@ def parking_spots():
     ]}
 
 
-@app.post("/api/mask")
-def parking_mask(req: MaskRequest):
-    """Reuse predict.py's binary mask logic without another model inference.
+@app.post("/api/spots/check")
+def check_spots(req: SpotCheckRequest):
+    """Check spot points against the boxes the GUI is showing, without rerunning the model.
 
-    The GUI supplies original-image dimensions and its confidence/class-filtered
-    boxes, so both the displayed mask and spot checks use the same detections.
+    The GUI sends its confidence/class-filtered boxes, so the statuses match what's drawn.
+    Uses the same check_parking_spots() as predict.py.
     """
-    import cv2
-    import numpy as np
-    from predict import ParkingSpot, check_parking_spots, create_mask
+    from predict import ParkingSpot, check_parking_spots
 
-    if req.width * req.height > 40_000_000:
-        raise HTTPException(422, "Image must contain at most 40 million pixels")
     spots = None if req.spots is None else [
         ParkingSpot(spot.spot_number, spot.coordinate) for spot in req.spots
     ]
     if spots is not None and len({spot.spot_number for spot in spots}) != len(spots):
         raise HTTPException(422, "Each parking spot must have a unique spot number")
-    # create_mask only uses the image's shape; no image colors are needed here.
-    image_shape = np.empty((req.height, req.width), dtype=np.uint8)
-    mask = create_mask(image_shape, [{"bbox": box.bbox} for box in req.detections])
-    success, png = cv2.imencode(".png", mask)
-    if not success:
-        raise HTTPException(500, "Could not encode the detection mask")
-    return {
-        "width": req.width,
-        "height": req.height,
-        "mask": "data:image/png;base64," + base64.b64encode(png.tobytes()).decode("ascii"),
-        "spots": check_parking_spots(mask, spots),
-    }
+    detections = [{"bbox": box.bbox} for box in req.detections]
+    return {"spots": check_parking_spots(detections, (req.width, req.height), spots)}
+
+
+# Masks are turned off: spots are checked against the boxes directly (POST /api/spots/check).
+# class MaskRequest(BaseModel):
+#     width: int = Field(gt=0, le=16384)
+#     height: int = Field(gt=0, le=16384)
+#     detections: list[DetectionBox] = Field(default_factory=list)
+#     # Omission uses predict.py's configuration; [] explicitly checks no spots.
+#     spots: list[SpotCoordinate] | None = None
+#
+#
+# @app.post("/api/mask")
+# def parking_mask(req: MaskRequest):
+#     """Reuse predict.py's binary mask logic without another model inference.
+#
+#     The GUI supplies original-image dimensions and its confidence/class-filtered
+#     boxes, so both the displayed mask and spot checks use the same detections.
+#     """
+#     import cv2
+#     import numpy as np
+#     from predict import ParkingSpot, check_parking_spots, create_mask
+#
+#     if req.width * req.height > 40_000_000:
+#         raise HTTPException(422, "Image must contain at most 40 million pixels")
+#     spots = None if req.spots is None else [
+#         ParkingSpot(spot.spot_number, spot.coordinate) for spot in req.spots
+#     ]
+#     if spots is not None and len({spot.spot_number for spot in spots}) != len(spots):
+#         raise HTTPException(422, "Each parking spot must have a unique spot number")
+#     # create_mask only uses the image's shape; no image colors are needed here.
+#     image_shape = np.empty((req.height, req.width), dtype=np.uint8)
+#     mask = create_mask(image_shape, [{"bbox": box.bbox} for box in req.detections])
+#     success, png = cv2.imencode(".png", mask)
+#     if not success:
+#         raise HTTPException(500, "Could not encode the detection mask")
+#     return {
+#         "width": req.width,
+#         "height": req.height,
+#         "mask": "data:image/png;base64," + base64.b64encode(png.tobytes()).decode("ascii"),
+#         "spots": check_parking_spots(mask, spots),
+#     }
 
 
 # --- Training / testing jobs ---

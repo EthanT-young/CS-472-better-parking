@@ -11,7 +11,8 @@ API:
   POST /predict   multipart upload with the image in an "image" field, e.g.
                     curl -F image=@snapshot.jpg "http://127.0.0.1:8001/predict?conf=0.5&classes=2&classes=7"
                   returns {"count", "width", "height", "detections": [...]}
-                  each detection has bbox [x1, y1, x2, y2], center, confidence, class_id, class_name
+                  each detection has bbox [x1, y1, x2, y2], bottom_center (middle of the box's
+                  bottom edge), confidence, class_id, class_name
                   (pixel coordinates in the uploaded image)
 
 """

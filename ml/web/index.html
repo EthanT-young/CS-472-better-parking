@@ -48,18 +48,23 @@
         <div class="actions">
           <button id="run-btn" class="primary">Run</button>
           <label><input id="auto-input" type="checkbox" checked> Auto-run</label>
-          <label><input id="boxes-input" type="checkbox"> Boxes</label>
-          <label><input id="centers-input" type="checkbox"> Centers</label>
+          <label><input id="boxes-input" type="checkbox" checked> Boxes</label>
+          <label><input id="centers-input" type="checkbox"> Bottom centers</label>
+          <label><input id="spots-input" type="checkbox" checked> Spot points</label>
           <button id="save-btn" disabled>Save annotated</button>
+          <!-- Masks are turned off: spots are checked against the bounding boxes directly.
           <button id="save-mask-btn" disabled>Save mask</button>
+          -->
         </div>
       </div>
 
+      <!-- Masks are turned off: spots are checked against the bounding boxes directly.
       <div class="mask-toolbar">
         <label>View <select id="mask-view"><option value="overlay" selected>Mask overlay</option><option value="photo">Photo</option><option value="binary">Binary mask</option></select></label>
         <label><input id="spots-input" type="checkbox" checked> Spot points</label>
         <span id="mask-status" class="muted" aria-live="polite">Run an image to see its mask.</span>
       </div>
+      -->
       <div id="stage" class="stage">
         <canvas id="canvas"></canvas>
         <div id="stage-message" class="stage-message">Select an image from the sidebar.</div>
@@ -71,8 +76,9 @@
           <label>Spot number <input id="spot-number" type="number" min="1" step="1" value="1"></label>
           <label><input id="place-spot" type="checkbox" checked> Click image to place point</label>
           <button id="reset-spots" type="button">Reset to configured spots</button>
+          <span id="spot-status" class="muted" aria-live="polite"></span>
         </div>
-        <p class="spot-help muted">Click a car or an empty space to test a point. Reusing a spot number moves its point. Edits are temporary; copy the list below into PARKING_SPOTS in predict.py to keep them. Use the same camera view and original image resolution.</p>
+        <p class="spot-help muted">Click a car or an empty space to test a point; a spot is occupied when its point is inside a detected vehicle's box. Reusing a spot number moves its point. Edits are temporary; copy the list below into PARKING_SPOTS in predict.py to keep them. Use the same camera view and original image resolution.</p>
         <div id="spot-list" class="spot-list" aria-live="polite"></div>
         <details class="spot-code">
           <summary>Coordinates for predict.py</summary>
@@ -92,7 +98,7 @@
   <section id="view-train" class="view job" data-job="train">
     <form class="job-form">
       <label>Dataset YAML <input name="data" value="data.yaml" spellcheck="false"></label>
-      <label>Base model <input name="base" value="yolov8n.pt" spellcheck="false" list="model-options"></label>
+      <label>Run name <input name="name" value="parking" spellcheck="false"></label>
       <label>Epochs <input name="epochs" type="number" min="1" value="50"></label>
       <label>Batch size <input name="batch" type="number" min="1" value="16"></label>
       <label>Image size <input name="imgsz" type="number" min="32" step="32" value="640"></label>
@@ -108,7 +114,7 @@
   <!-- Test -->
   <section id="view-test" class="view job" data-job="test">
     <form class="job-form">
-      <label>Model weights <input name="model" value="runs/detect/train/weights/best.pt" spellcheck="false" list="model-options"></label>
+      <label>Model weights <input name="model" value="models/parking_detector.pt" spellcheck="false" list="model-options"></label>
       <label>Dataset YAML <input name="data" value="data.yaml" spellcheck="false"></label>
       <label>Split
         <select name="split"><option>val</option><option>test</option></select>

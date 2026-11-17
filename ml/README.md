@@ -42,12 +42,12 @@ curl -F image=@snapshot.jpg "http://127.0.0.1:8001/predict?conf=0.5&classes=2&cl
 {
   "count": 1, "width": 1280, "height": 720, "inference_ms": 8.3,
   "detections": [
-    {"bbox": [412, 230, 804, 537], "center": [608, 383], "confidence": 0.91, "class_id": 2, "class_name": "car"}
+    {"bbox": [412, 230, 804, 537], "bottom_center": [608, 537], "confidence": 0.91, "class_id": 2, "class_name": "car"}
   ]
 }
 ```
 
-`bbox` and `center` are pixel coordinates in the uploaded image. Unreadable images return `400`, and images over 20 MB return `413`.
+`bbox` and `bottom_center` are pixel coordinates in the uploaded image. `bottom_center` is the middle of the box's bottom edge, roughly where the vehicle meets the ground. Unreadable images return `400`, and images over 20 MB return `413`.
 
 From the backend, send the snapshot bytes directly; there's no need to save them to a file first:
 
@@ -69,9 +69,11 @@ cd ml/
 python gui.py          # then open http://127.0.0.1:8000
 ```
 
-- **Predict**: type or browse to a folder in the sidebar, then click an image (or use the arrow keys) to run the model on it. Detections are drawn over the image, with a dot at the center of each box labeled with its pixel coordinates in the original image. *Boxes* and *Centers* show or hide each. Change the model, confidence, and vehicle classes in the toolbar. The confidence slider and class checkboxes filter the results instantly without rerunning the model, and results are remembered when you revisit an image. Click *Run* to force a fresh run. *Save annotated* downloads the image with its boxes.
-- **Train**: same options as `train.py`. Output streams into the log, and *Stop* cancels the run.
-- **Test**: runs `test.py` against a dataset split and shows the mAP results in the log.
+- **Predict**: type or browse to a folder in the sidebar, then click an image (or use the arrow keys) to run the model on it. Detections are drawn over the image, with a dot at the middle of each box's bottom edge labeled with its pixel coordinates in the original image. *Boxes* and *Bottom centers* show or hide each. Change the model, confidence, and vehicle classes in the toolbar. The confidence slider and class checkboxes filter the results instantly without rerunning the model, and results are remembered when you revisit an image. Click *Run* to force a fresh run. *Save annotated* downloads the image with its boxes.
+- **Parking spots**: a spot is occupied when its point is inside one of the detected vehicle boxes shown on screen. Spot statuses follow the selected confidence and classes, using the same `check_parking_spots()` function as `predict.py` without running YOLO again. *Spot points* shows or hides the points.
+- **Choose coordinates**: the GUI loads `PARKING_SPOTS` from `predict.py`. Set a spot number and enable point placement, then click the image to add or move that spot. Points use the original image's `(x, y)` coordinates, even when the image is scaled to fit the screen. The spot list shows occupied, empty, or unknown (outside the image); points await detection results before receiving a status. These edits are temporary. Copy the displayed `PARKING_SPOTS` snippet into `predict.py` when you have chosen your fixed coordinates, then restart the GUI to load them. Reuse coordinates only with the same camera view and resolution.
+- **Train**: same options as `train.py`, which fine-tunes `models/parking_detector.pt` and saves weights to `runs/train/<run name>/weights/best.pt`. Output streams into the log, and *Stop* cancels the run.
+- **Test**: runs `test.py` against a dataset split and shows the mAP results in the log. Pick trained weights from the *Model weights* suggestions after a training run.
 
 Use `--port` to change the port. On WSL, open the URL in your Windows browser as usual. Use `--host 0.0.0.0` only on a trusted network, because the GUI can browse folders on this machine.
 
@@ -84,16 +86,45 @@ python predict.py --image path/to/garage_image.jpg
 
 ```
 
-Prints the vehicle count, then each vehicle's class, confidence, and the center `(x, y)` of its bounding box in pixels:
+Prints the vehicle count, then each vehicle's class, confidence, and the bottom center `(x, y)` of its bounding box in pixels (the middle of the box's bottom edge, roughly where the vehicle meets the ground):
 
 ```
 Vehicles detected: 2
-  car 0.91 center (608, 383)
-  truck 0.78 center (1520, 940)
-Saved mask to /…/ml/masks/garage_image.jpg
+  car 0.91 bottom center (608, 537)
+  truck 0.78 bottom center (1520, 1180)
 ```
 
-Every run also saves a mask of each image to `ml/masks/`: the original image with everything outside the detected vehicles' bounding boxes blacked out. Masks keep the image's file name (HEIC images are saved as `.jpg`) and are overwritten on the next run of the same image. They use the same `--conf` and `--classes` as the detections, so `--classes 2` masks only cars.
+### Fixed parking spot coordinates
+
+Edit `PARKING_SPOTS` near the top of `predict.py` to set your measured spot numbers and coordinates. The list starts empty; the values below only demonstrate the format:
+
+```python
+PARKING_SPOTS: list[ParkingSpot] = [
+    ParkingSpot(spot_number=1, coordinate=(1000, 1900)),
+    ParkingSpot(spot_number=2, coordinate=(1800, 1900)),
+]
+```
+
+Coordinates are `(x, y)` pixels in the original image, measured from its top-left corner. Reuse them only for the same camera view and resolution. A spot is occupied when its point is inside any detected vehicle's bounding box (`x1 <= x < x2` and `y1 <= y < y2`), empty when it isn't, and unknown when the coordinate is outside the image. Missed detections or a neighboring vehicle's box can affect occupancy. The detections follow `--conf` and `--classes`, so `--classes 2` only counts cars.
+
+The command line prints each configured spot's status. Add `--visualize` to draw the spot points and numbers over the detection image (red for occupied, green for empty).
+
+```python
+import cv2
+from predict import ParkingDetector, ParkingSpot, check_parking_spots
+
+detector = ParkingDetector()  # defaults to models/parking_detector.pt beside predict.py
+detections = detector.get_detections("garage.jpg")
+height, width = cv2.imread("garage.jpg").shape[:2]
+image_size = (width, height)  # so points outside the image come back as None
+spot = ParkingSpot(spot_number=1, coordinate=(1000, 1900))
+print(spot.is_occupied(detections, image_size))  # True, False, or None for an out-of-image point
+print(check_parking_spots(detections, image_size))  # checks PARKING_SPOTS without rerunning YOLO
+
+# Alternatively, run inference and check all configured spots in one call:
+statuses = detector.get_spot_statuses("garage.jpg")
+# [{"spot_number": 1, "coordinate": (1000, 1900), "occupied": True}, ...]
+```
 
 ### Python Code
 
@@ -124,7 +155,7 @@ Pass all your images in one command rather than running the script once per imag
 ### Examples
 
 ```bash
-# Count all vehicles and print their centers
+# Count all vehicles and print their bottom centers
 python predict.py --image garage.jpg
 
 # Detect only cars
@@ -182,22 +213,22 @@ Get detailed detection results for each vehicle.
 ```python
 detections = detector.get_detections("garage.jpg")
 for det in detections:
-    print(f"BBox: {det['bbox']}, Center: {det['center']}, Confidence: {det['confidence']:.2f}")
+    print(f"BBox: {det['bbox']}, Bottom center: {det['bottom_center']}, Confidence: {det['confidence']:.2f}")
 
 
 ```
 
 `image_path` can also be an image already in memory (a NumPy array as returned by `cv2.imread`/`cv2.imdecode`).
 
-Returns list of dicts with keys: `bbox` (`[x1, y1, x2, y2]`), `center` (`(x, y)`, the middle of `bbox`), `confidence`, `class_id`, `class_name`. All coordinates are pixels in the original image.
+Returns list of dicts with keys: `bbox` (`[x1, y1, x2, y2]`), `bottom_center` (`(x, y)`, the middle of the bottom edge of `bbox`: `((x1 + x2) // 2, y2)`), `confidence`, `class_id`, `class_name`. All coordinates are pixels in the original image.
 
-#### `get_centers(image_path, min_confidence=0.5, classes=None)`
+#### `get_bottom_centers(image_path, min_confidence=0.5, classes=None)`
 
-Get just the center `(x, y)` of each vehicle's bounding box, in pixels. Useful for checking which parking spot each vehicle is in.
+Get just the bottom center `(x, y)` of each vehicle's bounding box, in pixels. This is roughly where the vehicle meets the ground, which is useful for checking which parking spot each vehicle is in.
 
 ```python
-centers = detector.get_centers("garage.jpg")
-print(centers)  # e.g., [(608, 383), (1520, 940)]
+points = detector.get_bottom_centers("garage.jpg")
+print(points)  # e.g., [(608, 537), (1520, 1180)]
 
 
 ```
@@ -208,21 +239,6 @@ Run detection and save annotated image with bounding boxes.
 
 ```python
 detector.visualize("garage.jpg", "annotated_output.jpg")
-
-
-```
-
-#### `mask_image(image, detections)`
-
-A function in `predict.py` (not a method) that returns a copy of the image with everything outside the detected vehicles' bounding boxes blacked out. This is the mask the command line saves to `ml/masks/`. Pass the image as a NumPy array, along with the detections found in that same array:
-
-```python
-import cv2
-from predict import mask_image
-
-image = cv2.imread("garage.jpg")
-masked = mask_image(image, detector.get_detections(image))
-cv2.imwrite("garage_mask.jpg", masked)
 
 
 ```
@@ -242,13 +258,13 @@ for result in detector.predict_many(images):
 
 ```
 
-To get the same detection dicts as `get_detections` (with `center`), pass each result to `to_detections`:
+To get the same detection dicts as `get_detections` (with `bottom_center`), pass each result to `to_detections`:
 
 ```python
 from predict import to_detections
 
 for result in detector.predict_many(images):
-    centers = [det["center"] for det in to_detections(result)]
+    points = [det["bottom_center"] for det in to_detections(result)]
 
 
 ```

@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from ultralytics import YOLO
 import cv2
-import numpy as np
+# import numpy as np  # only the commented-out mask code below used NumPy
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 DEFAULT_MODEL_PATH = Path(__file__).resolve().parent / "models" / "parking_detector.pt"
-# The command line saves a mask of every image here (ml/masks), wherever it's run from
-MASKS_DIR = Path(__file__).resolve().parent / "masks"
+# Masks are turned off: spots are checked against the bounding boxes directly.
+# # The command line saves a mask of every image here (ml/masks), wherever it's run from
+# MASKS_DIR = Path(__file__).resolve().parent / "masks"
 
 
 @dataclass(frozen=True)
@@ -17,18 +18,18 @@ class ParkingSpot:
     spot_number: int
     coordinate: tuple[int, int]
 
-    def is_occupied(self, mask):
-        """Return whether the point is white; None means it is outside the image.
+    def is_occupied(self, detections, image_size):
+        """Return whether the point is inside any detection's bounding box.
 
-        Use a 2D binary detection mask, not the color image from mask_image().
+        image_size is the original image's (width, height); a point outside the image
+        returns None (unknown). Box right/bottom edges are exclusive, so a point exactly
+        on x2 or y2 is outside that box.
         """
-        if mask.ndim != 2:
-            raise ValueError("Expected a 2D binary mask")
         x, y = self.coordinate
-        height, width = mask.shape
+        width, height = image_size
         if not (0 <= x < width and 0 <= y < height):
             return None
-        return bool(mask[y, x])
+        return any(x1 <= x < x2 and y1 <= y < y2 for x1, y1, x2, y2 in (d["bbox"] for d in detections))
 
 
 # Set these once for your camera view, using original-image pixels (x, y).
@@ -39,31 +40,36 @@ PARKING_SPOTS: list[ParkingSpot] = [
 ]
 
 
-def create_mask(image, detections):
-    """Return a uint8 mask: 255 inside vehicle boxes, 0 everywhere else.
+# Masks are turned off: a box mask held the same information as the boxes themselves,
+# so spots are now checked against the boxes directly (see ParkingSpot.is_occupied).
+# def create_mask(image, detections):
+#     """Return a uint8 mask: 255 inside vehicle boxes, 0 everywhere else.
+#
+#     A detection model supplies rectangles, not precise vehicle silhouettes.
+#     Box right/bottom edges are exclusive, matching NumPy image slicing.
+#     """
+#     height, width = image.shape[:2]
+#     mask = np.zeros((height, width), dtype=np.uint8)
+#     for detection in detections:
+#         x1, y1, x2, y2 = map(int, detection["bbox"])
+#         x1, x2 = max(0, x1), min(width, x2)
+#         y1, y2 = max(0, y1), min(height, y2)
+#         if x1 < x2 and y1 < y2:
+#             mask[y1:y2, x1:x2] = 255
+#     return mask
 
-    A detection model supplies rectangles, not precise vehicle silhouettes.
-    Box right/bottom edges are exclusive, matching NumPy image slicing.
+
+def check_parking_spots(detections, image_size, spots=None):
+    """Check fixed points against one image's detections; occupied is True, False, or None.
+
+    image_size is the original image's (width, height).
     """
-    height, width = image.shape[:2]
-    mask = np.zeros((height, width), dtype=np.uint8)
-    for detection in detections:
-        x1, y1, x2, y2 = map(int, detection["bbox"])
-        x1, x2 = max(0, x1), min(width, x2)
-        y1, y2 = max(0, y1), min(height, y2)
-        if x1 < x2 and y1 < y2:
-            mask[y1:y2, x1:x2] = 255
-    return mask
-
-
-def check_parking_spots(mask, spots=None):
-    """Check fixed points against one mask; occupied is True, False, or None."""
     spots = PARKING_SPOTS if spots is None else spots
     return [
         {
             "spot_number": spot.spot_number,
             "coordinate": spot.coordinate,
-            "occupied": spot.is_occupied(mask),
+            "occupied": spot.is_occupied(detections, image_size),
         }
         for spot in spots
     ]
@@ -85,8 +91,9 @@ def collect_images(paths):
 def to_detections(result):
     """Convert one ultralytics result into a list of detections in pixel coordinates.
 
-    Each detection has bbox [x1, y1, x2, y2], center (x, y) of the bbox, confidence,
-    class_id and class_name.
+    Each detection has bbox [x1, y1, x2, y2], bottom_center (x, y), confidence, class_id
+    and class_name. bottom_center is the middle of the box's bottom edge, roughly where the
+    vehicle meets the ground.
     """
     # Grabs all boxes from GPU now to the CPU, reducing sync time
     boxes = result.boxes.cpu()
@@ -94,7 +101,7 @@ def to_detections(result):
     for (x1, y1, x2, y2), conf, cls in zip(boxes.xyxy.int().tolist(), boxes.conf.tolist(), boxes.cls.int().tolist()):
         detections.append({
             "bbox": [x1, y1, x2, y2],
-            "center": ((x1 + x2) // 2, (y1 + y2) // 2),
+            "bottom_center": ((x1 + x2) // 2, y2),
             "confidence": conf,
             "class_id": cls,
             "class_name": result.names.get(cls, str(cls))
@@ -102,13 +109,13 @@ def to_detections(result):
     return detections
 
 
-def mask_image(image, detections):
-    """Return a copy of image that keeps only the pixels inside the detection boxes; the rest is black.
-
-    image is a BGR NumPy array (e.g. from cv2.imread), and detections are the ones found in that
-    same image (from get_detections or to_detections).
-    """
-    return cv2.bitwise_and(image, image, mask=create_mask(image, detections))
+# def mask_image(image, detections):
+#     """Return a copy of image that keeps only the pixels inside the detection boxes; the rest is black.
+#
+#     image is a BGR NumPy array (e.g. from cv2.imread), and detections are the ones found in that
+#     same image (from get_detections or to_detections).
+#     """
+#     return cv2.bitwise_and(image, image, mask=create_mask(image, detections))
 
 
 class ParkingDetector:
@@ -160,19 +167,20 @@ class ParkingDetector:
     def get_detections(self, image_path, min_confidence=0.5, classes=None):
         return to_detections(self._predict(image_path, min_confidence, classes)[0])
 
-    def get_centers(self, image_path, min_confidence=0.5, classes=None):
-        # Center (x, y) of each vehicle's bounding box in pixels, e.g. to check which spot it's in
-        return [d["center"] for d in self.get_detections(image_path, min_confidence, classes)]
+    def get_bottom_centers(self, image_path, min_confidence=0.5, classes=None):
+        # Middle (x, y) of each vehicle box's bottom edge in pixels, e.g. to check which spot it's in
+        return [d["bottom_center"] for d in self.get_detections(image_path, min_confidence, classes)]
 
-    def get_mask(self, image_path, min_confidence=0.5, classes=None):
-        """Run the model once and return an original-resolution binary mask."""
-        result = self._predict(image_path, min_confidence, classes)[0]
-        return create_mask(result.orig_img, to_detections(result))
+    # def get_mask(self, image_path, min_confidence=0.5, classes=None):
+    #     """Run the model once and return an original-resolution binary mask."""
+    #     result = self._predict(image_path, min_confidence, classes)[0]
+    #     return create_mask(result.orig_img, to_detections(result))
 
     def get_spot_statuses(self, image_path, min_confidence=0.5, classes=None, spots=None):
-        """Run the model once and check PARKING_SPOTS (or the supplied spots)."""
-        mask = self.get_mask(image_path, min_confidence, classes)
-        return check_parking_spots(mask, spots)
+        """Run the model once and check PARKING_SPOTS (or the supplied spots) against its boxes."""
+        result = self._predict(image_path, min_confidence, classes)[0]
+        height, width = result.orig_img.shape[:2]
+        return check_parking_spots(to_detections(result), (width, height), spots)
 
     def visualize(self, image_path, output_path="output.jpg", min_confidence=0.5):
         results = self._predict(image_path, min_confidence)
@@ -214,7 +222,7 @@ if __name__ == "__main__":
         output = Path(args.output or ("output.jpg" if single else "output"))
         if not single:
             output.mkdir(parents=True, exist_ok=True)
-    MASKS_DIR.mkdir(parents=True, exist_ok=True)
+    # MASKS_DIR.mkdir(parents=True, exist_ok=True)
 
     detector = ParkingDetector(args.model, vehicle_classes=args.classes)
     if not PARKING_SPOTS:
@@ -232,23 +240,26 @@ if __name__ == "__main__":
         count = len(detections)
         total += count
         print(f"Vehicles detected: {count}" if single else f"{result.path}: {count}")
-        # Center (x, y) of each bounding box, in pixels of the original image
+        # Middle (x, y) of each box's bottom edge, in pixels of the original image
         for d in detections:
-            print(f"  {d['class_name']} {d['confidence']:.2f} center {d['center']}")
+            print(f"  {d['class_name']} {d['confidence']:.2f} bottom center {d['bottom_center']}")
 
-        # Save a lossless binary mask and use that same mask for point checks.
-        mask = create_mask(result.orig_img, detections)
-        statuses = check_parking_spots(mask)
+        # A spot is occupied when its point is inside any detected vehicle's bounding box
+        height, width = result.orig_img.shape[:2]
+        statuses = check_parking_spots(detections, (width, height))
         for spot in statuses:
             state = ("unknown (coordinate outside image)" if spot["occupied"] is None
                      else "occupied" if spot["occupied"] else "empty")
             print(f"  Spot {spot['spot_number']} at {spot['coordinate']}: {state}")
-        image_path = Path(result.path)
-        mask_path = MASKS_DIR / (image_path.stem + "_mask.png")
-        if not cv2.imwrite(str(mask_path), mask):
-            raise OSError(f"Could not save mask to {mask_path}")
-        if single:
-            print(f"Saved mask to {mask_path}")
+
+        # # Save a lossless binary mask of the boxes
+        # mask = create_mask(result.orig_img, detections)
+        # image_path = Path(result.path)
+        # mask_path = MASKS_DIR / (image_path.stem + "_mask.png")
+        # if not cv2.imwrite(str(mask_path), mask):
+        #     raise OSError(f"Could not save mask to {mask_path}")
+        # if single:
+        #     print(f"Saved mask to {mask_path}")
 
         if args.visualize:
             out_path = output if single else output / Path(result.path).name
@@ -270,6 +281,6 @@ if __name__ == "__main__":
         processed = len(images) - len(skipped)
         print(f"Total vehicles detected: {total} across {processed} images"
               + (f" ({len(skipped)} skipped)" if skipped else ""))
-        print(f"Saved {processed} masks to {MASKS_DIR}")
+        # print(f"Saved {processed} masks to {MASKS_DIR}")
     if skipped:
         sys.exit(1)

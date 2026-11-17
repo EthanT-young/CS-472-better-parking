@@ -44,11 +44,8 @@ const state = {
   requestId: 0,
   imageId: 0,
   folderId: 0,
-  maskId: 0,
-  maskTimer: null,
-  mask: null,
-  maskImage: null,
-  maskOverlay: null,
+  spotCheckId: 0,
+  spotTimer: null,
   spots: [],
   configuredSpots: [],
   spotStatuses: null,
@@ -150,16 +147,11 @@ function imagePath() {
   return joinPath(state.folder, state.selected);
 }
 
-function invalidateMask() {
-  clearTimeout(state.maskTimer);
-  state.maskId++;
-  state.mask = null;
-  state.maskImage = null;
-  state.maskOverlay = null;
+function invalidateSpots() {
+  clearTimeout(state.spotTimer);
+  state.spotCheckId++;
   state.spotStatuses = null;
-  $("#save-mask-btn").disabled = true;
-  $("#save-btn").disabled = true;
-  $("#mask-status").textContent = state.detections === null ? "Run an image to see its mask." : "Updating mask…";
+  $("#spot-status").textContent = "";
   renderSpots();
 }
 
@@ -168,7 +160,8 @@ function invalidatePrediction() {
   state.requestId++;
   state.detections = null;
   $("#run-btn").disabled = false;
-  invalidateMask();
+  $("#save-btn").disabled = true;
+  invalidateSpots();
 }
 
 function selectImage(name) {
@@ -267,7 +260,8 @@ function refilter() {
     const shown = visibleDetections();
     setResult(`${state.selected} — ${shown.length} vehicle${shown.length === 1 ? "" : "s"} detected`, summarize(shown));
   }
-  refreshMask();
+  $("#save-btn").disabled = !state.image || state.detections === null;
+  refreshSpots();
   render();
 }
 
@@ -304,29 +298,9 @@ $("#centers-input").addEventListener("change", render);
 // Draws the image plus overlays. `scale` maps image pixels to canvas pixels.
 function drawScene(context, scale, offsetX, offsetY) {
   const img = state.image;
-  const mode = $("#mask-view").value;
-  const w = img.width * scale, h = img.height * scale;
-  if (mode === "binary") {
-    context.fillStyle = "#161b22";
-    context.fillRect(offsetX, offsetY, w, h);
-    if (state.maskImage) {
-      context.save();
-      context.imageSmoothingEnabled = false;
-      context.drawImage(state.maskImage, offsetX, offsetY, w, h);
-      context.restore();
-    }
-  } else {
-    context.drawImage(img, offsetX, offsetY, w, h);
-    if (mode === "overlay" && state.maskOverlay) {
-      context.save();
-      context.globalCompositeOperation = "screen";
-      context.globalAlpha = 0.65;
-      context.drawImage(state.maskOverlay, offsetX, offsetY, w, h);
-      context.restore();
-    }
-    if (state.detections && ($("#boxes-input").checked || $("#centers-input").checked)) {
-      drawDetections(context, scale, offsetX, offsetY);
-    }
+  context.drawImage(img, offsetX, offsetY, img.width * scale, img.height * scale);
+  if (state.detections && ($("#boxes-input").checked || $("#centers-input").checked)) {
+    drawDetections(context, scale, offsetX, offsetY);
   }
   if ($("#spots-input").checked) drawSpots(context, scale, offsetX, offsetY);
 }
@@ -361,13 +335,15 @@ function drawDetections(context, scale, offsetX, offsetY) {
     }
   }
 
-  // Drawn after all boxes so no box covers a center. Coordinates are in original image pixels.
+  // Middle of each box's bottom edge, drawn after all boxes so no box covers it.
+  // Coordinates are in original image pixels.
   if ($("#centers-input").checked) {
     const radius = lineWidth * 2;
     const right = offsetX + state.image.width * scale;
+    const bottom = offsetY + state.image.height * scale;
     context.lineWidth = Math.max(1, lineWidth / 2);
     for (const d of detections) {
-      const [cx, cy] = d.center;
+      const [cx, cy] = d.bottom_center;
       const x = offsetX + cx * scale;
       const y = offsetY + cy * scale;
       const color = colorFor(d.class_id);
@@ -378,11 +354,12 @@ function drawDetections(context, scale, offsetX, offsetY) {
       context.strokeStyle = "#fff";
       context.stroke();
 
-      // Coordinates go right of the dot, or left of it when they would run off the image
+      // Coordinates go right of the dot, or left of it when they would run off the image.
+      // Boxes often touch the bottom of the photo, so keep the label above the image's edge.
       const text = `(${cx}, ${cy})`;
       const w = context.measureText(text).width + pad * 2;
       const tx = x + radius + pad + w <= right ? x + radius + pad : x - radius - pad - w;
-      tag(text, tx, y - h / 2, color);
+      tag(text, tx, Math.min(y - h / 2, bottom - h), color);
     }
   }
 }
@@ -403,9 +380,9 @@ function render() {
 
 new ResizeObserver(render).observe(canvas);
 
-// Saves the current view at full resolution; raw mask download excludes all annotations.
+// Saves the current view (image, boxes, centers, spot points) at full resolution.
 $("#save-btn").addEventListener("click", () => {
-  if (!state.image || !state.mask) return;
+  if (!state.image || state.detections === null) return;
   const out = document.createElement("canvas");
   out.width = state.image.width;
   out.height = state.image.height;
@@ -426,19 +403,17 @@ function download(url, name) {
   a.click();
 }
 
-$("#save-mask-btn").addEventListener("click", () => {
-  if (state.mask) download(state.mask, state.selected.replace(/\.[^.]+$/, "") + "_mask.png");
-});
+/* ---------- Parking spots ---------- */
 
-/* ---------- Binary masks and parking spots ---------- */
-
-function refreshMask() {
-  invalidateMask();
+// Asks the server which spot points are inside the boxes currently shown (the same
+// check_parking_spots() as predict.py), without rerunning the model.
+function refreshSpots() {
+  invalidateSpots();
   if (!state.image || state.detections === null) return;
-  const id = state.maskId;
-  state.maskTimer = setTimeout(async () => {
+  const id = state.spotCheckId;
+  state.spotTimer = setTimeout(async () => {
     try {
-      const data = await api("/api/mask", {
+      const data = await api("/api/spots/check", {
         method: "POST",
         body: {
           width: state.image.naturalWidth,
@@ -447,34 +422,12 @@ function refreshMask() {
           spots: state.spots,
         },
       });
-      if (id !== state.maskId) return;
-      const img = new Image();
-      img.onload = () => {
-        if (id !== state.maskId) return;
-        state.mask = data.mask;
-        state.maskImage = img;
-        state.spotStatuses = data.spots;
-        const overlay = document.createElement("canvas");
-        overlay.width = img.width;
-        overlay.height = img.height;
-        const c = overlay.getContext("2d");
-        c.drawImage(img, 0, 0);
-        c.globalCompositeOperation = "multiply";
-        c.fillStyle = "#00bfff";
-        c.fillRect(0, 0, overlay.width, overlay.height);
-        state.maskOverlay = overlay;
-        $("#mask-status").textContent = `${data.width} × ${data.height} mask · white = inside a vehicle box`;
-        $("#save-mask-btn").disabled = false;
-        $("#save-btn").disabled = false;
-        renderSpots();
-        render();
-      };
-      img.onerror = () => {
-        if (id === state.maskId) $("#mask-status").textContent = "Could not display the mask. Run again to retry.";
-      };
-      img.src = data.mask;
+      if (id !== state.spotCheckId) return;
+      state.spotStatuses = data.spots;
+      renderSpots();
+      render();
     } catch (err) {
-      if (id === state.maskId) $("#mask-status").textContent = `Mask error: ${err.message}`;
+      if (id === state.spotCheckId) $("#spot-status").textContent = `Spot check error: ${err.message}`;
     }
   }, 120);
 }
@@ -512,7 +465,7 @@ function renderSpots() {
       state.spots = state.spots.filter((s) => s.spot_number !== spot.spot_number);
       state.spotRevision++;
       $("#copy-status").textContent = "";
-      refreshMask();
+      refreshSpots();
       render();
     });
     row.append(text, badge, remove);
@@ -569,7 +522,7 @@ canvas.addEventListener("click", (event) => {
   state.spots.sort((a, b) => a.spot_number - b.spot_number);
   state.spotRevision++;
   $("#copy-status").textContent = "";
-  refreshMask();
+  refreshSpots();
   render();
 });
 
@@ -577,7 +530,7 @@ $("#reset-spots").addEventListener("click", () => {
   state.spots = state.configuredSpots.map((s) => ({...s, coordinate: [...s.coordinate]}));
   state.spotRevision++;
   $("#copy-status").textContent = "";
-  refreshMask();
+  refreshSpots();
   render();
 });
 $("#copy-spots").addEventListener("click", async () => {
@@ -590,7 +543,6 @@ $("#copy-spots").addEventListener("click", async () => {
     $("#copy-status").textContent = "Text selected. Copy it with your keyboard.";
   }
 });
-$("#mask-view").addEventListener("change", render);
 $("#spots-input").addEventListener("change", render);
 $("#place-spot").addEventListener("change", () => $("#stage").classList.toggle("placing", $("#place-spot").checked));
 $("#stage").classList.toggle("placing", $("#place-spot").checked);
@@ -601,7 +553,7 @@ async function loadSpots() {
     state.configuredSpots = data.spots;
     if (state.spotRevision === 0) {
       state.spots = data.spots.map((s) => ({...s, coordinate: [...s.coordinate]}));
-      refreshMask();
+      refreshSpots();
       render();
     }
   } catch (err) {

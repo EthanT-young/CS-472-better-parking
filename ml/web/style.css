@@ -172,7 +172,7 @@ nav { display: flex; }
 .job-form { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; }
 .job-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
 .job-form label input, .job-form label select { color: var(--text); font-size: 13px; }
-.job-form input[name=data], .job-form input[name=base], .job-form input[name=model] { width: 280px; }
+.job-form input[name=data], .job-form input[name=model] { width: 280px; }
 .job-form input[type=number] { width: 100px; }
 .job-buttons { display: flex; gap: 8px; align-items: center; }
 
