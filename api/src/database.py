@@ -6,10 +6,10 @@ from supabase.client import AsyncClientOptions
 
 load_dotenv()
 
-# initialize supabase client
+# initialize async Supabase client for listening to database changes
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
-async def create_supabase():
+async def create_async_supabase():
     supabase: AsyncClient = await acreate_client(
         url,
         key,
@@ -19,57 +19,40 @@ async def create_supabase():
     )
     return supabase
 
-# runs when a record is updated in supabase
-# prints the payload sent by supabase
+# runs when a record is updated in Supabase
+# prints the payload sent by Supabase
 def handle_record_updated(payload):
     print("record updated:", payload)
 
-
-# listens for updates in the sections table
-async def subscribe_to_sections(supabase: AsyncClient):
+# listens for updates in the spaces table
+async def subscribe_to_spaces(supabase: AsyncClient):
     channel = supabase.channel("room1")
 
-    response = (
-        await channel
-        .on_postgres_changes("UPDATE", schema="parking", table="sections", callback=handle_record_updated)
+    await (
+         channel
+        .on_postgres_changes("UPDATE", schema="parking", table="spaces", callback=handle_record_updated)
         .subscribe()
     )
 
-    try:
-        # keep script running to listen for events
-        while True:
-            await asyncio.sleep(1)
-    finally:
-        # close supabase realtime
-        print("Closing supabase realtime connection...")
-        await supabase.remove_all_channels()
+# this function was created with the help of claude
+# I asked it how to make subscribe_to_spaces() run in the background so that I could upsert data
+# while also listening for updates in Supabase.
+# I also asked claude for some help with the subscribe_to_spaces() function, but that was just to make sure
+# I could safely remove the code I found redundant
+async def main():
+        sb_async = await create_async_supabase() # create asynchronous Supabase client
+        await subscribe_to_spaces(sb_async)
 
-        """
-        The following 5 lines were written by claude.
-            I gave it a copy of the file, and told it "This runs fine, but when I force terminate it, I get a bunch of 
-            errors". It gave me some code that looked like what I had above (I sent an outdated file without it), 
-            although at a glance, it didn't look correct.
-
-            Anyway, after that, I was more specific and said "I get 'Task was destroyed but it is pending!'. 
-            It then gave the code below, which worked.
-
-        Additionally, the code
-            except KeyboardInterrupt:
-                print("Closing program") 
-        towards the end of the file was also written by claude in the first query from above. This also worked.
-        """
-        # cancel any background tasks the realtime client left running
-        leftover = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-        for task in leftover:
-            task.cancel()
-        await asyncio.gather(*leftover, return_exceptions=True)
-
+        # loops infinitely to listen for Supabase record changes
+        try:
+            while True:
+                await asyncio.sleep(1)
+        finally:
+            print("Closing supabase realtime connection...")
+            await sb_async.remove_all_channels()
 
 if __name__ == "__main__":
     try:
-        sb = asyncio.run(create_supabase()) # create supabase client
-        asyncio.run(subscribe_to_sections(sb))
+        asyncio.run(main())
     except KeyboardInterrupt:
-        print("Closing program")
-    except Exception as err:
-        print(f"Adding seed data failed: {err}")
+        print("Closing program...")
