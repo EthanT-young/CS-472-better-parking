@@ -1,12 +1,19 @@
+
 "use client";
 
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 import { ImageOverlay, MapContainer, Polygon } from "react-leaflet";
 
 import { canPark } from "@/lib/permits";
-
 import { labelMap } from "./labelMap";
-import type { Level, Permit, Stall, StallStatus } from "@/types/parking";
+
+import type {
+  Level,
+  Permit,
+  Stall,
+  StallStatus,
+} from "@/types/parking";
 
 export type StallMapProps = {
   garageId: string;
@@ -19,20 +26,28 @@ export type StallMapProps = {
   onSelectStall: (stall: Stall) => void;
 };
 
-// Two states only (open / taken); patterns carry the meaning as well as color.
-// Every edge and fill is at least 3:1 against the map background (WCAG 1.4.11):
-// open is emerald-600 (3.5:1) inside a near-black border, taken is slate-500 with white
-// stripes, and stalls outside your permit have a slate-500 dashed edge (4.5:1).
+// Two states only (open / taken); patterns carry meaning
+// as well as color for WCAG 1.4.1 and 1.4.11.
 function stallStyle(
-  status: StallStatus,
+  status: StallStatus | undefined,
   eligible: boolean,
   selected: boolean,
   highContrast: boolean
 ): L.PathOptions {
+  if (status === undefined) {
+    return {
+      color: "#475569",
+      weight: selected ? 3 : 1.5,
+      dashArray: "4 3",
+      fillColor: "#e2e8f0",
+      fillOpacity: 0.8,
+    };
+  }
+
   if (!eligible) {
     return {
       color: highContrast ? "#000000" : "#62748e",
-      weight: 0.75,
+      weight: selected ? 3 : 0.75,
       dashArray: "2 3",
       fillColor: "#ffffff",
       fillOpacity: highContrast ? 0 : 0.55,
@@ -44,26 +59,127 @@ function stallStyle(
       ? {
           color: highContrast ? "#000000" : "#002c22",
           weight: highContrast ? 2 : 1,
-          fillColor: highContrast ? "url(#stall-open-hc)" : "url(#stall-open)",
+          fillColor: highContrast
+            ? "url(#stall-open-hc)"
+            : "url(#stall-open)",
           fillOpacity: 1,
         }
       : {
           color: highContrast ? "#000000" : "#334155",
           weight: 1,
-          fillColor: highContrast ? "url(#stall-taken-hc)" : "url(#stall-taken)",
+          fillColor: highContrast
+            ? "url(#stall-taken-hc)"
+            : "url(#stall-taken)",
           fillOpacity: 1,
         };
 
-  // Black outline over a white halo (drawn separately): visible on any fill, and not red vs green.
-  return selected ? { ...base, color: "#000000", weight: 3 } : base;
+  return selected
+    ? { ...base, color: "#000000", weight: 3 }
+    : base;
 }
 
+// Preserve the white selection halo.
 const selectedHalo: L.PathOptions = {
   color: "#ffffff",
   weight: 7,
   fill: false,
   interactive: false,
 };
+
+// WCAG 1.1.1, 2.1.1, 4.1.2
+// An accessible, keyboard-operable parking stall polygon.
+type AccessibleStallPolygonProps = {
+  stall: Stall;
+  positions: L.LatLngTuple[];
+  status: StallStatus | undefined;
+  eligible: boolean;
+  selected: boolean;
+  highContrast: boolean;
+  onSelect: (stall: Stall) => void;
+};
+
+function AccessibleStallPolygon({
+  stall,
+  positions,
+  status,
+  eligible,
+  selected,
+  highContrast,
+  onSelect,
+}: AccessibleStallPolygonProps) {
+  const polygonRef = useRef<L.Polygon | null>(null);
+
+  useEffect(() => {
+    const polygon = polygonRef.current;
+    const element = polygon?.getElement();
+
+    if (!element) return;
+
+    // Make the SVG path reachable using Tab.
+    element.setAttribute("tabindex", "0");
+
+    // Identify the polygon as an interactive button.
+    element.setAttribute("role", "button");
+
+    // Give screen readers information about the stall.
+    const accessibleLabel = [
+      `Stall ${stall.id}`,
+      stall.type,
+      status === "open"
+        ? "Open"
+        : status === "taken"
+          ? "Taken"
+          : "Status unavailable",
+      eligible
+        ? "Included in selected parking filter"
+        : "Outside selected parking filter",
+    ].join(", ");
+
+    element.setAttribute("aria-label", accessibleLabel);
+
+    // Indicate which stall is currently selected.
+    element.setAttribute("aria-pressed", String(selected));
+
+    // Draw the selected polygon above other polygons.
+    // This avoids removing and recreating its DOM element.
+    if (selected) {
+      polygon?.bringToFront();
+    }
+
+    // Allow Enter and Space to select this stall.
+    function handleKeyDown(event: Event) {
+      if (!(event instanceof KeyboardEvent)) return;
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        event.stopPropagation();
+        onSelect(stall);
+      }
+    }
+
+    element.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      element.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [stall, status, eligible, selected, onSelect]);
+
+  return (
+    <Polygon
+      ref={polygonRef}
+      positions={positions}
+      pathOptions={stallStyle(
+        status,
+        eligible,
+        selected,
+        highContrast
+      )}
+      eventHandlers={{
+        click: () => onSelect(stall),
+      }}
+    />
+  );
+}
 
 export default function StallMap({
   garageId,
@@ -86,35 +202,21 @@ export default function StallMap({
     return [height - (y - minY), x - minX];
   }
 
-  function stallPolygon(stall: Stall) {
-    const status = stalls[stall.id] ?? "taken";
-    const eligible = canPark(permit, stall.type);
-
-    return (
-      <Polygon
-        key={stall.id}
-        positions={stall.points.map(toMapPoint)}
-        pathOptions={stallStyle(
-          status,
-          eligible,
-          stall.id === selectedStallId,
-          highContrast
-        )}
-        eventHandlers={{ click: () => onSelectStall(stall) }}
-      />
-    );
-  }
-
-  // The selected stall is drawn last so its outline isn't covered by its neighbours.
-  const selectedStall = level.stalls?.find((stall) => stall.id === selectedStallId);
+  // Find the selected stall for its visual halo.
+  const selectedStall = level.stalls?.find(
+    (stall) => stall.id === selectedStallId
+  );
 
   return (
     <MapContainer
       ref={(map) =>
         labelMap(
           map,
-          `Stall map, ${level.name}. Use arrow keys to pan and plus or minus to zoom. ` +
-            "Open stalls are also listed below the map."
+          `Stall map, ${level.name}. ` +
+            "Use Tab to navigate parking stalls. " +
+            "Press Enter or Space to select a stall. " +
+            "Use arrow keys to pan and plus or minus to zoom. " +
+            "A parking stall list is also available below the map."
         )
       }
       key={`${garageId}:${level.id}`}
@@ -125,11 +227,13 @@ export default function StallMap({
       maxZoom={2}
       zoomSnap={0.25}
       scrollWheelZoom={false}
-      // One-finger drags scroll the page on phones; pinch still zooms.
+      // One-finger drags scroll the page on phones;
+      // pinch still zooms.
       dragging={!L.Browser.mobile}
       attributionControl={false}
       className="stall-map h-full w-full"
     >
+      {/* Garage floor-plan image */}
       {level.imageUrl && (
         <ImageOverlay
           url={level.imageUrl}
@@ -139,19 +243,35 @@ export default function StallMap({
         />
       )}
 
-      {level.stalls
-        ?.filter((stall) => stall.id !== selectedStallId)
-        .map(stallPolygon)}
+      {/* Keep every polygon mounted and keyed consistently.
+          This helps preserve focus when selection changes. */}
+      {level.stalls?.map((stall) => {
+        const status = stalls[stall.id];
+        const eligible = canPark(permit, stall.type);
+        const selected = stall.id === selectedStallId;
 
-      {selectedStall && (
-        <>
-          <Polygon
-            key={`${selectedStall.id}:halo`}
-            positions={selectedStall.points.map(toMapPoint)}
-            pathOptions={selectedHalo}
+        return (
+          <AccessibleStallPolygon
+            key={stall.id}
+            stall={stall}
+            positions={stall.points.map(toMapPoint)}
+            status={status}
+            eligible={eligible}
+            selected={selected}
+            highContrast={highContrast}
+            onSelect={onSelectStall}
           />
-          {stallPolygon(selectedStall)}
-        </>
+        );
+      })}
+
+      {/* Selection halo. This overlay is not interactive.
+          The selected polygon is brought above it. */}
+      {selectedStall && (
+        <Polygon
+          key={`${selectedStall.id}:halo`}
+          positions={selectedStall.points.map(toMapPoint)}
+          pathOptions={selectedHalo}
+        />
       )}
     </MapContainer>
   );
