@@ -35,8 +35,15 @@ class ParkingSpot:
 # Set these once for your camera view, using original-image pixels (x, y).
 # Replace the commented example with your measured spot numbers and coordinates.
 # Keep the camera position and image resolution the same when reusing this list.
+# This needs to be changed when calling the model
 PARKING_SPOTS: list[ParkingSpot] = [
     # ParkingSpot(spot_number=1, coordinate=(1000, 1900)),
+    ParkingSpot(spot_number=1, coordinate=(675, 1284)),
+    ParkingSpot(spot_number=2, coordinate=(1056, 1252)),
+    ParkingSpot(spot_number=3, coordinate=(1458, 1264)),
+    ParkingSpot(spot_number=4, coordinate=(1851, 1257)),
+    ParkingSpot(spot_number=5, coordinate=(2212, 1264)),
+    ParkingSpot(spot_number=6, coordinate=(2707, 1262))
 ]
 
 
