@@ -171,10 +171,11 @@ function cameraId() {
   return $("#cam-predict-input").value.trim();
 }
 
+// With a camera, spots depend on the confidence and the classes checked, so both are in the key
 function resultKey() {
   const camera = cameraId();
-  const conf = camera ? $("#conf-input").value : "floor";
-  return `${$("#model-input").value}|${camera}|${conf}|${imagePath()}`;
+  if (!camera) return `${$("#model-input").value}|floor|${imagePath()}`;
+  return `${$("#model-input").value}|${camera}|${$("#conf-input").value}|${selectedClasses().join(",")}|${imagePath()}`;
 }
 
 // Shows saved results right away; otherwise waits briefly so arrowing quickly
@@ -199,11 +200,12 @@ async function runModel() {
   $("#run-btn").disabled = true;
   setResult(name, "Running model…");
   try {
-    // With a camera, the check runs at the slider's confidence so the spot counts match it
+    // With a camera, the check runs at the slider's confidence and the checked classes, so the
+    // spot counts match what the slider and checkboxes show
     const body = {
       path: imagePath(),
       model: $("#model-input").value,
-      classes: ALL_CLASSES,
+      classes: camera ? selectedClasses() : ALL_CLASSES,
       conf: camera ? Number($("#conf-input").value) : CONF_FLOOR,
     };
     const data = camera
@@ -243,9 +245,12 @@ function refilter() {
 function cameraSummary(shown) {
   if (!state.camera) return "";
   const inRoi = shown.filter((d) => d.in_roi).length;
-  const { spots_total: total, occupied, free } = state.camera;
+  const { spots_total: total, occupied, free, unknown } = state.camera;
   const parts = [`${state.camera.camera_id}: ${inRoi} inside regions`];
-  if (total) parts.push(`${occupied} of ${total} spots occupied, ${free} free`);
+  if (total) {
+    const unknownText = unknown ? `, ${unknown} outside regions` : "";
+    parts.push(`${occupied} of ${total} spots occupied, ${free} free${unknownText}`);
+  }
   return parts.join(" · ");
 }
 
@@ -273,7 +278,11 @@ $("#model-input").addEventListener("change", () => {
 $("#cam-predict-input").addEventListener("change", () => {
   if ($("#auto-input").checked && state.image) scheduleRun();
 });
-document.querySelectorAll(".classes input").forEach((el) => el.addEventListener("change", refilter));
+document.querySelectorAll(".classes input").forEach((el) => el.addEventListener("change", () => {
+  refilter();
+  // With a camera, the checked classes also decide the spot counts, so the check runs again
+  if (cameraId()) scheduleRun();
+}));
 $("#boxes-input").addEventListener("change", render);
 
 /* ---------- Predict: drawing ---------- */
@@ -314,7 +323,8 @@ function drawCameraLayout(context, scale, offsetX, offsetY) {
     context.fillText(roi.name, x + 4, y + 4);
   }
   for (const spot of state.camera.spots) {
-    const color = spot.occupied ? "#ef4444" : "#22c55e";
+    // Grey when the spot is outside every region, so its status is unknown
+    const color = spot.occupied === null ? "#9ca3af" : spot.occupied ? "#ef4444" : "#22c55e";
     outline(spot.corners, color, [8, 5]);
     const [x, y] = toCanvas(spot.corners[0]);
     context.fillStyle = color;
@@ -603,7 +613,9 @@ roiCanvas.addEventListener("pointermove", (event) => {
 roiCanvas.addEventListener("pointerup", () => {
   const drag = roiState.drag;
   roiState.drag = null;
-  if (drag && Math.abs(drag.x2 - drag.x1) >= 5 && Math.abs(drag.y2 - drag.y1) >= 5) {
+  // Compare in screen pixels, so a small jitter on a large photo still counts as a click
+  const screenScale = drag ? roiTransform().scale : 1;
+  if (drag && Math.abs(drag.x2 - drag.x1) * screenScale >= 5 && Math.abs(drag.y2 - drag.y1) * screenScale >= 5) {
     // A drag makes an axis-aligned rectangle
     roiState.points = [];
     addRegion(rectCorners(drag));

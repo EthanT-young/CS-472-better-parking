@@ -126,7 +126,7 @@ class CameraCheckRequest(PredictRequest):
 @app.post("/api/camera-check")
 def camera_check(req: CameraCheckRequest):
     """Same logic as serve.py's /predict with camera_id, plus the camera's layout for drawing."""
-    from camera_config import CameraConfigError, check_image_size, in_roi_flags, load_camera, spot_status
+    from camera_config import CameraConfigError, camera_summary, check_image_size, load_camera
 
     detections, width, height = run_detector(req.path, req.model, req.classes, req.conf)
     try:
@@ -139,25 +139,25 @@ def camera_check(req: CameraCheckRequest):
     except CameraConfigError as error:
         raise HTTPException(500, str(error))
 
-    for detection, inside in zip(detections, in_roi_flags(camera, detections)):
+    summary = camera_summary(camera, detections)
+    for detection, inside in zip(detections, summary["flags"]):
         detection["in_roi"] = inside
-    in_rois = [d for d in detections if d["in_roi"]]
-    spots = spot_status(camera, in_rois)
-    occupied = sum(1 for s in spots if s["occupied"])
+    in_rois = summary["in_rois"]
     return {
         "detections": detections,
-        "count": len(detections),
+        "count": len(in_rois),
         "camera": {
             "camera_id": camera["camera_id"],
             "image_size": [width, height],
             "vehicles_in_rois": len(in_rois),
-            "spots_total": len(spots),
-            "occupied": occupied,
-            "free": len(spots) - occupied,
+            "spots_total": len(summary["spots"]),
+            "occupied": summary["occupied"],
+            "unknown": summary["unknown"],
+            "free": summary["free"],
             "rois": [{"name": r["name"], "corners": r["polygon"].tolist()} for r in camera["rois"]],
             "spots": [
                 {**s, "corners": spot["polygon"].tolist()}
-                for s, spot in zip(spots, camera["spots"])
+                for s, spot in zip(summary["spots"], camera["spots"])
             ],
         },
     }

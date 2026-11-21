@@ -13,11 +13,8 @@ API:
                   returns {"count", "width", "height", "detections": [...]}
                   each detection has bbox [x1, y1, x2, y2], center, confidence, class_id, class_name
                   (pixel coordinates in the uploaded image)
-                  with camera_id=<id> (e.g. ?camera_id=garage-1) the response also has camera_id,
-                  spots_total, occupied, free and spots (one per spot in ml/cameras/<id>.json).
-                  with camera_id, count and detections cover only vehicles inside the camera's regions
-                  of interest. outside_rois is how many were left out, and the same vehicles decide
-                  which spots are occupied.
+                  with camera_id=<id> (e.g. ?camera_id=garage-1) the response is only {"count", "camera_id", "inference_ms"},
+                  where count is the vehicles inside that camera's regions (ml/cameras/<id>.json).
 
 """
 
@@ -30,7 +27,7 @@ import cv2
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 
-from camera_config import CameraConfigError, check_image_size, load_camera, spot_status, vehicles_in_rois
+from camera_config import CameraConfigError, check_image_size, in_roi_flags, load_camera
 from predict import ParkingDetector
 
 MODEL_PATH = os.environ.get("PARKING_MODEL", "models/parking_detector.pt")
@@ -108,21 +105,9 @@ def predict(
     }
 
     if camera is not None:
-        # With a camera, only vehicles inside its regions are counted and returned
-        in_rois = vehicles_in_rois(camera, detections)
-        spots = spot_status(camera, in_rois)
-        occupied = sum(1 for spot in spots if spot["occupied"])
-        response.update({
-            "count": len(in_rois),
-            "detections": in_rois,
-            "outside_rois": len(detections) - len(in_rois),
-            "camera_id": camera_id,
-            "vehicles_in_rois": len(in_rois),
-            "spots_total": len(spots),
-            "occupied": occupied,
-            "free": len(spots) - occupied,
-            "spots": spots,
-        })
+        # With a camera, only vehicles inside its regions are counted
+        count = sum(in_roi_flags(camera, detections))
+        return {"count": count, "camera_id": camera_id, "inference_ms": response["inference_ms"]}
     return response
 
 

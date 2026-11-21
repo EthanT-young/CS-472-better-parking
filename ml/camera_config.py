@@ -163,6 +163,12 @@ def check_image_size(camera, width, height):
         )
 
 
+def _inside_any_roi(camera, point):
+    x, y = float(point[0]), float(point[1])
+    return any(cv2.pointPolygonTest(roi["polygon"].reshape(-1, 1, 2), (x, y), False) >= 0
+               for roi in camera["rois"])
+
+
 def in_roi_flags(camera, detections):
     """One bool per detection: True when its bottom-centre is inside an ROI. With no ROIs, all True."""
     if not camera["rois"]:
@@ -170,9 +176,7 @@ def in_roi_flags(camera, detections):
     flags = []
     for d in detections:
         x1, _, x2, y2 = d["bbox"]
-        point = (float((x1 + x2) / 2), float(y2))
-        flags.append(any(cv2.pointPolygonTest(roi["polygon"].reshape(-1, 1, 2), point, False) >= 0
-                         for roi in camera["rois"]))
+        flags.append(_inside_any_roi(camera, ((x1 + x2) / 2, y2)))
     return flags
 
 
@@ -182,7 +186,11 @@ def vehicles_in_rois(camera, detections):
 
 
 def spot_status(camera, detections):
-    """Return one status dict per spot: occupied (bool) and the largest overlap with any vehicle."""
+    """
+    One status dict per spot. occupied is True or False, or None when the spot can't be seen:
+    if the camera has regions and the spot's centre lies outside all of them, the spot is unknown.
+    detections should already be the vehicles inside the regions.
+    """
     boxes = [
         np.array([[x1, y1], [x2, y1], [x2, y2], [x1, y2]], dtype=np.float32)
         for x1, y1, x2, y2 in (d["bbox"] for d in detections)
@@ -190,6 +198,9 @@ def spot_status(camera, detections):
     statuses = []
     for spot in camera["spots"]:
         polygon = spot["polygon"]
+        if camera["rois"] and not _inside_any_roi(camera, polygon.mean(axis=0)):
+            statuses.append({"spot_id": spot["spot_id"], "occupied": None, "overlap": None})
+            continue
         spot_area = cv2.contourArea(polygon)
         best = 0.0
         for box in boxes:
@@ -202,3 +213,20 @@ def spot_status(camera, detections):
             "overlap": round(best, 3),
         })
     return statuses
+
+
+def camera_summary(camera, detections):
+    """Everything the service and the GUI report for one frame, from the same logic."""
+    flags = in_roi_flags(camera, detections)
+    in_rois = [d for d, inside in zip(detections, flags) if inside]
+    spots = spot_status(camera, in_rois)
+    occupied = sum(1 for s in spots if s["occupied"] is True)
+    unknown = sum(1 for s in spots if s["occupied"] is None)
+    return {
+        "flags": flags,
+        "in_rois": in_rois,
+        "spots": spots,
+        "occupied": occupied,
+        "unknown": unknown,
+        "free": len(spots) - occupied - unknown,
+    }
