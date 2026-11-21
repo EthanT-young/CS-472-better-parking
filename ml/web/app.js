@@ -404,7 +404,8 @@ const roiState = {
   camera: null,          // camera id that is loaded (may not have a config file yet)
   cameraImageSize: null, // [width, height] the camera's config was drawn at, or null
   image: null,           // HTMLImageElement
-  spots: [],             // existing spots, for reference only: [{id, corners}]
+  mode: "region",        // "region" or "spot": what drawing adds and which list is shown
+  spots: [],             // [{id, corners}]
   regions: [],           // [{name, corners}]
   drag: null,            // {x1, y1, x2, y2} while the pointer is down
   points: [],            // corners clicked so far for an angled region (up to 4)
@@ -479,7 +480,13 @@ function renderRegions() {
   const t = roiTransform();
   roiCtx.drawImage(img, t.offsetX, t.offsetY, img.naturalWidth * t.scale, img.naturalHeight * t.scale);
 
-  for (const spot of roiState.spots) drawPolygon(spot.corners, t, "#9ca3af", [4, 4]);
+  for (const spot of roiState.spots) {
+    drawPolygon(spot.corners, t, "#22c55e", [8, 5]);
+    const [x, y] = spot.corners[0];
+    roiCtx.font = "600 13px system-ui, sans-serif";
+    roiCtx.fillStyle = "#22c55e";
+    roiCtx.fillText(String(spot.id), t.offsetX + x * t.scale + 4, t.offsetY + y * t.scale + 4);
+  }
   roiState.regions.forEach((region, i) => {
     const color = ROI_COLORS[i % ROI_COLORS.length];
     drawPolygon(region.corners, t, color, []);
@@ -509,31 +516,50 @@ function renderRegions() {
   }
 }
 
+// Lists the regions or the spots, depending on the mode. Each row is editable.
 function renderRegionList() {
   const list = $("#roi-list");
   list.replaceChildren();
-  roiState.regions.forEach((region, i) => {
-    const item = document.createElement("li");
-    const name = document.createElement("input");
-    name.value = region.name;
-    name.addEventListener("input", () => { region.name = name.value; renderRegions(); });
+  const spotMode = roiState.mode === "spot";
+  const items = spotMode ? roiState.spots : roiState.regions;
+  items.forEach((item, i) => {
+    const row = document.createElement("li");
+    const label = document.createElement("input");
+    if (spotMode) {
+      label.type = "number";
+      label.min = "1";
+      label.value = item.id;
+      label.title = "Spot id (matches the database space_id)";
+      label.addEventListener("input", () => { item.id = Number(label.value); renderRegions(); });
+    } else {
+      label.value = item.name;
+      label.addEventListener("input", () => { item.name = label.value; renderRegions(); });
+    }
     const remove = document.createElement("button");
     remove.type = "button";
     remove.textContent = "×";
-    remove.title = "Delete region";
+    remove.title = spotMode ? "Delete spot" : "Delete region";
     remove.addEventListener("click", () => {
-      roiState.regions.splice(i, 1);
+      items.splice(i, 1);
       renderRegionList();
       renderRegions();
       updateRoiControls();
     });
-    item.append(name, remove);
-    list.append(item);
+    row.append(label, remove);
+    list.append(row);
   });
 }
 
+function nextSpotId() {
+  return roiState.spots.reduce((max, s) => Math.max(max, Number(s.id) || 0), 0) + 1;
+}
+
 function updateRoiControls() {
-  $("#roi-save-btn").disabled = !(roiState.camera && roiState.image);
+  const ready = roiState.camera && roiState.image;
+  $("#roi-save-btn").disabled = !ready;
+  $("#spot-save-btn").disabled = !ready;
+  $("#mode-region-btn").classList.toggle("active", roiState.mode === "region");
+  $("#mode-spot-btn").classList.toggle("active", roiState.mode === "spot");
   $("#roi-message").textContent = roiState.image ? "" : "Load a camera, then choose an image.";
 }
 
@@ -544,7 +570,7 @@ async function loadCamera() {
     const cam = await api(`/api/cameras/${encodeURIComponent(id)}`);
     roiState.camera = id;
     roiState.cameraImageSize = cam.image_size;
-    roiState.spots = cam.spots;
+    roiState.spots = cam.spots.map((s) => ({ id: s.id, corners: s.corners }));
     roiState.regions = cam.rois.map((r) => ({ name: r.name, corners: r.corners }));
     renderRegionList();
     renderRegions();
@@ -595,6 +621,33 @@ async function saveRegions() {
   }
 }
 
+async function saveSpots() {
+  const img = roiState.image;
+  const spots = roiState.spots.map((s) => ({
+    id: Number(s.id),
+    corners: s.corners.map(([x, y]) => [Math.round(x), Math.round(y)]),
+  }));
+  try {
+    const res = await api(`/api/cameras/${encodeURIComponent(roiState.camera)}/spots`, {
+      method: "PUT",
+      body: { image_size: [img.naturalWidth, img.naturalHeight], spots },
+    });
+    setRoiStatus(`Saved ${res.spots.length} spot(s) to ${res.camera_id}.`);
+  } catch (err) {
+    setRoiStatus(`Not saved: ${err.message}`, true);
+  }
+}
+
+// Switches what drawing adds: regions or spots
+function setRoiMode(mode) {
+  roiState.mode = mode;
+  roiState.points = [];
+  setRoiStatus(mode === "spot" ? "Spot mode: drawing adds a spot with the next id." : "Region mode: drawing adds a region.");
+  renderRegionList();
+  renderRegions();
+  updateRoiControls();
+}
+
 roiCanvas.addEventListener("pointerdown", (event) => {
   if (!roiState.image) return;
   const [x, y] = roiPoint(event);
@@ -640,7 +693,11 @@ function addRegion(corners) {
     setRoiStatus("Those corners don't form a convex shape. Click the four corners in order around the spot.", true);
     return false;
   }
-  roiState.regions.push({ name: `region ${roiState.regions.length + 1}`, corners });
+  if (roiState.mode === "spot") {
+    roiState.spots.push({ id: nextSpotId(), corners });
+  } else {
+    roiState.regions.push({ name: `region ${roiState.regions.length + 1}`, corners });
+  }
   renderRegionList();
   setRoiStatus("");
   return true;
@@ -671,8 +728,12 @@ document.addEventListener("keydown", (event) => {
 $("#cam-load-btn").addEventListener("click", loadCamera);
 $("#cam-input").addEventListener("keydown", (event) => { if (event.key === "Enter") loadCamera(); });
 $("#use-image-btn").addEventListener("click", useSelectedImage);
+$("#mode-region-btn").addEventListener("click", () => setRoiMode("region"));
+$("#mode-spot-btn").addEventListener("click", () => setRoiMode("spot"));
+$("#spot-save-btn").addEventListener("click", saveSpots);
 $("#roi-clear-btn").addEventListener("click", () => {
-  roiState.regions = [];
+  if (roiState.mode === "spot") roiState.spots = [];
+  else roiState.regions = [];
   roiState.points = [];
   renderRegionList();
   renderRegions();

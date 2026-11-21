@@ -201,6 +201,26 @@ def put_rois(camera_id: str, req: RoisRequest):
     return {"camera_id": camera_id, "rois": [r["name"] for r in camera["rois"]]}
 
 
+class SpotsRequest(BaseModel):
+    image_size: list[int]  # [width, height] of the image the spots were drawn on
+    spots: list[dict]      # [{"id": int, "corners": [[x, y] x 4]}]
+
+
+@app.put("/api/cameras/{camera_id}/spots")
+def put_spots(camera_id: str, req: SpotsRequest):
+    from camera_config import CameraConfigError, save_spots
+
+    if len(req.image_size) != 2:
+        raise HTTPException(400, "image_size must be [width, height]")
+    try:
+        camera = save_spots(camera_id, req.image_size, req.spots)
+    except (ValueError, KeyError, TypeError) as error:
+        raise HTTPException(400, f"Invalid spots: {error}")
+    except CameraConfigError as error:
+        raise HTTPException(500, str(error))
+    return {"camera_id": camera_id, "spots": [s["spot_id"] for s in camera["spots"]]}
+
+
 # --- Training / testing jobs ---
 
 class Job:

@@ -13,8 +13,11 @@ API:
                   returns {"count", "width", "height", "detections": [...]}
                   each detection has bbox [x1, y1, x2, y2], center, confidence, class_id, class_name
                   (pixel coordinates in the uploaded image)
-                  with camera_id=<id> (e.g. ?camera_id=garage-1) the response is only {"count", "camera_id", "inference_ms"},
-                  where count is the vehicles inside that camera's regions (ml/cameras/<id>.json).
+                  with camera_id=<id> (e.g. ?camera_id=garage-1) the response is {"count", "camera_id",
+                  "inference_ms", "occupied", "free", "unknown", "spots"}. count is the vehicles inside that
+                  camera's regions, and spots has one {spot_id, occupied, overlap} entry per stall in
+                  ml/cameras/<id>.json. occupied is true or false, or null (unknown) for a stall outside
+                  every region.
 
 """
 
@@ -27,7 +30,7 @@ import cv2
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 
-from camera_config import CameraConfigError, check_image_size, in_roi_flags, load_camera
+from camera_config import CameraConfigError, camera_summary, check_image_size, load_camera
 from predict import ParkingDetector
 
 MODEL_PATH = os.environ.get("PARKING_MODEL", "models/parking_detector.pt")
@@ -106,8 +109,16 @@ def predict(
 
     if camera is not None:
         # With a camera, only vehicles inside its regions are counted
-        count = sum(in_roi_flags(camera, detections))
-        return {"count": count, "camera_id": camera_id, "inference_ms": response["inference_ms"]}
+        summary = camera_summary(camera, detections)
+        return {
+            "count": len(summary["in_rois"]),
+            "camera_id": camera_id,
+            "inference_ms": response["inference_ms"],
+            "occupied": summary["occupied"],
+            "free": summary["free"],
+            "unknown": summary["unknown"],
+            "spots": summary["spots"],
+        }
     return response
 
 

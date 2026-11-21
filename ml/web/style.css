@@ -195,3 +195,4 @@ nav { display: flex; }
 .roi-list input { flex: 1; min-width: 0; font-size: 13px; }
 .roi-list button { padding: 4px 8px; }
 #roi-canvas { cursor: crosshair; }
+.regions button.active { border-color: var(--accent); color: var(--accent); }

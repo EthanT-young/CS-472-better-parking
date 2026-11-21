@@ -125,11 +125,21 @@ def load_camera(camera_id):
 
 
 def save_rois(camera_id, image_size, rois):
-    """
-    Replace a camera's ROIs and keep its spots. Creates the file if the camera is new.
+    """Replace a camera's ROIs and keep its spots. Creates the file if the camera is new."""
+    return save_layout(camera_id, image_size, rois=rois)
 
-    rois is a list of {"name": str, "corners": [[x, y] x 4]}. Raises ValueError for bad input
-    (including an image_size that differs from the camera's existing config).
+
+def save_spots(camera_id, image_size, spots):
+    """Replace a camera's spots and keep its ROIs. Creates the file if the camera is new."""
+    return save_layout(camera_id, image_size, spots=spots)
+
+
+def save_layout(camera_id, image_size, spots=None, rois=None):
+    """
+    Write a camera's spots and/or ROIs. A list left as None keeps what is already saved.
+
+    spots is a list of {"id": int, "corners": [[x, y] x 4]}, rois of {"name": str, "corners": ...}.
+    Raises ValueError for bad input, including an image_size that differs from the existing config.
     """
     _check_camera_id(camera_id)
     existing = read_raw(camera_id) or {}
@@ -141,8 +151,8 @@ def save_rois(camera_id, image_size, rois):
     config = {
         "image_size": [int(v) for v in image_size],
         "occupied_overlap": existing.get("occupied_overlap", DEFAULT_OVERLAP),
-        "spots": existing.get("spots", []),
-        "rois": rois,
+        "spots": existing.get("spots", []) if spots is None else spots,
+        "rois": existing.get("rois", []) if rois is None else rois,
     }
     camera = _parse(camera_id, config)  # validate before anything is written
 
