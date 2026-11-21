@@ -87,12 +87,13 @@ class PredictRequest(BaseModel):
     conf: float = 0.5
 
 
-@app.post("/api/predict")
-def predict(req: PredictRequest):
+def run_detector(path, model, classes, conf):
+    """Run a model on an image in the project. Returns (detections, width, height)."""
     from predict import ParkingDetector  # deferred: importing ultralytics is slow
+    import cv2
 
-    image_path = resolve(req.path)
-    model_path = resolve(req.model)
+    image_path = resolve(path)
+    model_path = resolve(model)
     if not image_path.is_file():
         raise HTTPException(404, f"Image not found: {image_path}")
     if not model_path.is_file():
@@ -106,9 +107,60 @@ def predict(req: PredictRequest):
         if key not in _detectors or _detectors[key][0] != mtime:
             _detectors[key] = (mtime, ParkingDetector(key))
         detector = _detectors[key][1]
-        detections = detector.get_detections(str(image_path), min_confidence=req.conf, classes=req.classes)
+        detections = detector.get_detections(str(image_path), min_confidence=conf, classes=classes)
 
+    height, width = cv2.imread(str(image_path)).shape[:2]
+    return detections, width, height
+
+
+@app.post("/api/predict")
+def predict(req: PredictRequest):
+    detections, _, _ = run_detector(req.path, req.model, req.classes, req.conf)
     return {"detections": detections, "count": len(detections)}
+
+
+class CameraCheckRequest(PredictRequest):
+    camera_id: str
+
+
+@app.post("/api/camera-check")
+def camera_check(req: CameraCheckRequest):
+    """Same logic as serve.py's /predict with camera_id, plus the camera's layout for drawing."""
+    from camera_config import CameraConfigError, check_image_size, in_roi_flags, load_camera, spot_status
+
+    detections, width, height = run_detector(req.path, req.model, req.classes, req.conf)
+    try:
+        camera = load_camera(req.camera_id)
+        check_image_size(camera, width, height)
+    except FileNotFoundError as error:
+        raise HTTPException(404, str(error))
+    except ValueError as error:
+        raise HTTPException(400, str(error))
+    except CameraConfigError as error:
+        raise HTTPException(500, str(error))
+
+    for detection, inside in zip(detections, in_roi_flags(camera, detections)):
+        detection["in_roi"] = inside
+    in_rois = [d for d in detections if d["in_roi"]]
+    spots = spot_status(camera, in_rois)
+    occupied = sum(1 for s in spots if s["occupied"])
+    return {
+        "detections": detections,
+        "count": len(detections),
+        "camera": {
+            "camera_id": camera["camera_id"],
+            "image_size": [width, height],
+            "vehicles_in_rois": len(in_rois),
+            "spots_total": len(spots),
+            "occupied": occupied,
+            "free": len(spots) - occupied,
+            "rois": [{"name": r["name"], "corners": r["polygon"].tolist()} for r in camera["rois"]],
+            "spots": [
+                {**s, "corners": spot["polygon"].tolist()}
+                for s, spot in zip(spots, camera["spots"])
+            ],
+        },
+    }
 
 
 # --- Camera regions (ROIs) ---

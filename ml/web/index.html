@@ -36,6 +36,9 @@
           <input id="model-input" list="model-options" spellcheck="false" value="models/parking_detector.pt">
           <datalist id="model-options"></datalist>
         </label>
+        <label class="field">Camera (optional)
+          <input id="cam-predict-input" spellcheck="false" placeholder="e.g. garage-1">
+        </label>
         <label class="field">Confidence <span id="conf-value">0.50</span>
           <input id="conf-input" type="range" min="0.05" max="0.95" step="0.05" value="0.5">
         </label>

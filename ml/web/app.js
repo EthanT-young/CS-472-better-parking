@@ -41,6 +41,7 @@ const state = {
   selected: null,   // image name in current folder
   image: null,      // loaded HTMLImageElement
   detections: null, // all detections for the current image, in image pixel coordinates
+  camera: null,     // camera layout and spot status from /api/camera-check, if a camera was used
   requestId: 0,
   runTimer: null,
   results: new Map(), // "model|path" -> detections, so revisiting an image doesn't rerun the model
@@ -132,6 +133,7 @@ function selectImage(name) {
   clearTimeout(state.runTimer);
   state.selected = name;
   state.detections = null;
+  state.camera = null;
   document.querySelectorAll("#file-list li[data-name]").forEach((li) => {
     const isSelected = li.dataset.name === name;
     li.classList.toggle("selected", isSelected);
@@ -156,14 +158,23 @@ function selectedClasses() {
   return [...document.querySelectorAll(".classes input:checked")].map((el) => Number(el.value));
 }
 
+// With a camera, vehicles outside its regions are excluded from the count and the boxes
 function visibleDetections() {
   const classes = selectedClasses();
   const conf = Number($("#conf-input").value);
-  return state.detections.filter((d) => classes.includes(d.class_id) && d.confidence >= conf);
+  return state.detections.filter((d) =>
+    classes.includes(d.class_id) && d.confidence >= conf && (!state.camera || d.in_roi));
+}
+
+// The camera ID, if one is typed in the toolbar. Results are then checked against its regions.
+function cameraId() {
+  return $("#cam-predict-input").value.trim();
 }
 
 function resultKey() {
-  return `${$("#model-input").value}|${imagePath()}`;
+  const camera = cameraId();
+  const conf = camera ? $("#conf-input").value : "floor";
+  return `${$("#model-input").value}|${camera}|${conf}|${imagePath()}`;
 }
 
 // Shows saved results right away; otherwise waits briefly so arrowing quickly
@@ -184,23 +195,25 @@ async function runModel() {
   const id = ++state.requestId;
   const name = state.selected;
   const key = resultKey();
+  const camera = cameraId();
   $("#run-btn").disabled = true;
   setResult(name, "Running model…");
   try {
-    const data = await api("/api/predict", {
-      method: "POST",
-      body: {
-        path: imagePath(),
-        model: $("#model-input").value,
-        classes: ALL_CLASSES,
-        conf: CONF_FLOOR,
-      },
-    });
+    // With a camera, the check runs at the slider's confidence so the spot counts match it
+    const body = {
+      path: imagePath(),
+      model: $("#model-input").value,
+      classes: ALL_CLASSES,
+      conf: camera ? Number($("#conf-input").value) : CONF_FLOOR,
+    };
+    const data = camera
+      ? await api("/api/camera-check", { method: "POST", body: { ...body, camera_id: camera } })
+      : await api("/api/predict", { method: "POST", body });
     state.results.delete(key);
-    state.results.set(key, data.detections);
+    state.results.set(key, data);
     if (state.results.size > MAX_CACHED_RESULTS) state.results.delete(state.results.keys().next().value);
     if (id !== state.requestId) return;
-    showDetections(data.detections);
+    showDetections(data);
   } catch (err) {
     if (id === state.requestId) setResult(name, `Error: ${err.message}`);
   } finally {
@@ -208,8 +221,10 @@ async function runModel() {
   }
 }
 
-function showDetections(detections) {
-  state.detections = detections;
+// `data` is a /api/predict or /api/camera-check response. `camera` is null for plain runs.
+function showDetections(data) {
+  state.detections = data.detections;
+  state.camera = data.camera || null;
   $("#save-btn").disabled = false;
   refilter();
 }
@@ -218,9 +233,20 @@ function showDetections(detections) {
 function refilter() {
   if (state.detections) {
     const shown = visibleDetections();
-    setResult(`${state.selected} — ${shown.length} vehicle${shown.length === 1 ? "" : "s"} detected`, summarize(shown));
+    const title = `${state.selected} — ${shown.length} vehicle${shown.length === 1 ? "" : "s"} detected`;
+    setResult(title, cameraSummary(shown) || summarize(shown));
   }
   render();
+}
+
+// Camera line for the result bar: vehicles inside the regions and spot counts
+function cameraSummary(shown) {
+  if (!state.camera) return "";
+  const inRoi = shown.filter((d) => d.in_roi).length;
+  const { spots_total: total, occupied, free } = state.camera;
+  const parts = [`${state.camera.camera_id}: ${inRoi} inside regions`];
+  if (total) parts.push(`${occupied} of ${total} spots occupied, ${free} free`);
+  return parts.join(" · ");
 }
 
 function summarize(detections) {
@@ -238,8 +264,13 @@ $("#run-btn").addEventListener("click", runModel);
 $("#conf-input").addEventListener("input", (e) => {
   $("#conf-value").textContent = Number(e.target.value).toFixed(2);
   refilter();
+  // Spot occupancy depends on confidence, so a camera check has to run again
+  if (cameraId()) scheduleRun();
 });
 $("#model-input").addEventListener("change", () => {
+  if ($("#auto-input").checked && state.image) scheduleRun();
+});
+$("#cam-predict-input").addEventListener("change", () => {
   if ($("#auto-input").checked && state.image) scheduleRun();
 });
 document.querySelectorAll(".classes input").forEach((el) => el.addEventListener("change", refilter));
@@ -251,7 +282,44 @@ $("#boxes-input").addEventListener("change", render);
 function drawScene(context, scale, offsetX, offsetY) {
   const img = state.image;
   context.drawImage(img, offsetX, offsetY, img.width * scale, img.height * scale);
+  if (state.camera) drawCameraLayout(context, scale, offsetX, offsetY);
   if (state.detections && $("#boxes-input").checked) drawDetections(context, scale, offsetX, offsetY);
+}
+
+// Regions in cyan, spots green when free and red when occupied, numbered by spot id
+function drawCameraLayout(context, scale, offsetX, offsetY) {
+  const toCanvas = ([x, y]) => [offsetX + x * scale, offsetY + y * scale];
+  const lineWidth = Math.max(2, Math.round(2 * scale * Math.max(1, state.image.width / 1000)));
+  context.lineWidth = lineWidth;
+  context.font = `600 ${Math.max(12, Math.round(lineWidth * 6))}px system-ui, sans-serif`;
+  context.textBaseline = "top";
+
+  const outline = (corners, color, dash) => {
+    context.beginPath();
+    corners.forEach((point, i) => {
+      const [x, y] = toCanvas(point);
+      if (i === 0) context.moveTo(x, y); else context.lineTo(x, y);
+    });
+    context.closePath();
+    context.setLineDash(dash);
+    context.strokeStyle = color;
+    context.stroke();
+    context.setLineDash([]);
+  };
+
+  for (const roi of state.camera.rois) {
+    outline(roi.corners, "#22d3ee", []);
+    const [x, y] = toCanvas(roi.corners[0]);
+    context.fillStyle = "#22d3ee";
+    context.fillText(roi.name, x + 4, y + 4);
+  }
+  for (const spot of state.camera.spots) {
+    const color = spot.occupied ? "#ef4444" : "#22c55e";
+    outline(spot.corners, color, [8, 5]);
+    const [x, y] = toCanvas(spot.corners[0]);
+    context.fillStyle = color;
+    context.fillText(String(spot.spot_id), x + 4, y + 4);
+  }
 }
 
 function drawDetections(context, scale, offsetX, offsetY) {
@@ -265,8 +333,11 @@ function drawDetections(context, scale, offsetX, offsetY) {
     const [x1, y1, x2, y2] = d.bbox;
     const x = offsetX + x1 * scale;
     const y = offsetY + y1 * scale;
-    const color = colorFor(d.class_id);
+    // Vehicles outside the camera's regions are grey and dashed. Without a camera, all are inside.
+    const inside = d.in_roi !== false;
+    const color = inside ? colorFor(d.class_id) : "#9ca3af";
     context.strokeStyle = color;
+    context.setLineDash(inside ? [] : [8, 6]);
     context.strokeRect(x, y, (x2 - x1) * scale, (y2 - y1) * scale);
 
     const label = `${d.class_name} ${d.confidence.toFixed(2)}`;

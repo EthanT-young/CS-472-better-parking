@@ -15,8 +15,9 @@ API:
                   (pixel coordinates in the uploaded image)
                   with camera_id=<id> (e.g. ?camera_id=garage-1) the response also has camera_id,
                   spots_total, occupied, free and spots (one per spot in ml/cameras/<id>.json).
-                  count is still every vehicle in the frame. vehicles_in_rois is the number inside the
-                  camera's regions of interest, and only those vehicles decide which spots are occupied.
+                  with camera_id, count and detections cover only vehicles inside the camera's regions
+                  of interest. outside_rois is how many were left out, and the same vehicles decide
+                  which spots are occupied.
 
 """
 
@@ -107,10 +108,14 @@ def predict(
     }
 
     if camera is not None:
+        # With a camera, only vehicles inside its regions are counted and returned
         in_rois = vehicles_in_rois(camera, detections)
         spots = spot_status(camera, in_rois)
         occupied = sum(1 for spot in spots if spot["occupied"])
         response.update({
+            "count": len(in_rois),
+            "detections": in_rois,
+            "outside_rois": len(detections) - len(in_rois),
             "camera_id": camera_id,
             "vehicles_in_rois": len(in_rois),
             "spots_total": len(spots),

@@ -163,18 +163,22 @@ def check_image_size(camera, width, height):
         )
 
 
-def vehicles_in_rois(camera, detections):
-    """Keep only detections whose bottom-centre is inside an ROI. With no ROIs, keep everything."""
+def in_roi_flags(camera, detections):
+    """One bool per detection: True when its bottom-centre is inside an ROI. With no ROIs, all True."""
     if not camera["rois"]:
-        return detections
-    kept = []
+        return [True] * len(detections)
+    flags = []
     for d in detections:
         x1, _, x2, y2 = d["bbox"]
         point = (float((x1 + x2) / 2), float(y2))
-        if any(cv2.pointPolygonTest(roi["polygon"].reshape(-1, 1, 2), point, False) >= 0
-               for roi in camera["rois"]):
-            kept.append(d)
-    return kept
+        flags.append(any(cv2.pointPolygonTest(roi["polygon"].reshape(-1, 1, 2), point, False) >= 0
+                         for roi in camera["rois"]))
+    return flags
+
+
+def vehicles_in_rois(camera, detections):
+    """Keep only detections whose bottom-centre is inside an ROI. With no ROIs, keep everything."""
+    return [d for d, inside in zip(detections, in_roi_flags(camera, detections)) if inside]
 
 
 def spot_status(camera, detections):
