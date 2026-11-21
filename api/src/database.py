@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import asyncio
 from supabase import acreate_client, AsyncClient
 from supabase.client import AsyncClientOptions
+import random
 
 load_dotenv()
 
@@ -173,10 +174,38 @@ async def add_seed_data(sb: AsyncClient):
     await upsert_floor(supabase=sb, floor_id=19, lot_id=2, floor_num=3)
     await upsert_floor(supabase=sb, floor_id=20, lot_id=2, floor_num=4)
     print("Upserting Spaces")
-    # a couple spaces for testing the Supabase listener
-    # will add the rest after calculating spot numbers per floor for both garages using UNLV Park & Go website
-    await upsert_space(supabase=sb, space_id=1, floor_id=11, camera_id=500, space_type="staff", occupied=True)
-    await upsert_space(supabase=sb, space_id=301, floor_id=12, camera_id=500, space_type="staff", occupied=False)
+    # for upserting spaces, combine all records into an array so that we can upsert all 2,000+ spaces in one query
+    records = []
+    # space counts for each floor in Cottage Grove, calculated by adding up the spaces in each section on UNLV Park & Go
+    # will add Thomas and Mack when we figure out how the front-end will pull data from Supabase
+    space_counts = {"floor 1": {"id": 11, "staff": 201, "student": 26},
+                    "floor 2": {"id": 12, "staff": 39, "student": 378},
+                    "floor 3": {"id": 13, "staff": 0, "student": 417},
+                    "floor 4": {"id": 14, "staff": 0, "student": 417},
+                    "floor 5": {"id": 15, "staff": 0, "student": 417},
+                    "floor 6": {"id": 16, "staff": 0, "student": 384}}
+    # claude helped with this. I originally was upserting each record individually using for loops
+    # and I asked claude to optimize it. It then gave some code that was unnecessarily difficult to understand,
+    # so I asked it for a simpler implementation. It responded with code similar to what's below, but
+    # I did have to manually fix how it handled accessing dictionary values. claude also decided to take liberties
+    # when assigning camera_id for some reason. Overall, the structure was correct, but the actual data... not so much.
+    space_id = 1
+    for _, floor in space_counts.items(): # goes through every floor
+        for space_type in ("staff", "student"): # goes through every type of space (student and staff)
+            for i in range(floor[space_type]): # for each space, add a record for Supabase
+                records.append({
+                    "space_id": space_id,
+                    "floor_id": floor['id'],
+                    "camera_id": 500,
+                    "space_type": space_type,
+                    "occupied": random.choice([True, False]),
+                })
+                space_id += 1
+
+    # upserts all records in one query
+    await sb.table("spaces").upsert(records).execute()
+
+    print("Finished adding seed data!!!")
 
 
 # this function was created with the help of claude
