@@ -314,6 +314,290 @@ $("#save-btn").addEventListener("click", () => {
 
 /* ---------- Train / Test jobs ---------- */
 
+/* ---------- Regions of interest ---------- */
+
+// Regions are drawn in image pixels. Saved as 4 corners, so they match the camera config.
+const roiCanvas = $("#roi-canvas");
+const roiCtx = roiCanvas.getContext("2d");
+const roiState = {
+  camera: null,          // camera id that is loaded (may not have a config file yet)
+  cameraImageSize: null, // [width, height] the camera's config was drawn at, or null
+  image: null,           // HTMLImageElement
+  spots: [],             // existing spots, for reference only: [{id, corners}]
+  regions: [],           // [{name, corners}]
+  drag: null,            // {x1, y1, x2, y2} while the pointer is down
+  points: [],            // corners clicked so far for an angled region (up to 4)
+};
+const ROI_COLORS = ["#22c55e", "#3b82f6", "#f59e0b", "#ef4444", "#a855f7"];
+
+function setRoiStatus(text, isError = false) {
+  const el = $("#roi-status");
+  el.textContent = text;
+  el.style.color = isError ? "#ef4444" : "";
+}
+
+function roiTransform() {
+  const img = roiState.image;
+  const w = roiCanvas.clientWidth, h = roiCanvas.clientHeight;
+  const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+  return { scale, offsetX: (w - img.naturalWidth * scale) / 2, offsetY: (h - img.naturalHeight * scale) / 2 };
+}
+
+function roiPoint(event) {
+  const rect = roiCanvas.getBoundingClientRect();
+  const { scale, offsetX, offsetY } = roiTransform();
+  const x = (event.clientX - rect.left - offsetX) / scale;
+  const y = (event.clientY - rect.top - offsetY) / scale;
+  return [
+    Math.min(Math.max(x, 0), roiState.image.naturalWidth),
+    Math.min(Math.max(y, 0), roiState.image.naturalHeight),
+  ];
+}
+
+// Corners for an axis-aligned rectangle dragged from (x1, y1) to (x2, y2)
+function rectCorners({ x1, y1, x2, y2 }) {
+  const [left, right] = [Math.min(x1, x2), Math.max(x1, x2)];
+  const [top, bottom] = [Math.min(y1, y2), Math.max(y1, y2)];
+  return [[left, top], [right, top], [right, bottom], [left, bottom]];
+}
+
+function drawPolygon(corners, t, color, dash) {
+  roiCtx.beginPath();
+  corners.forEach(([x, y], i) => {
+    const px = t.offsetX + x * t.scale;
+    const py = t.offsetY + y * t.scale;
+    if (i === 0) roiCtx.moveTo(px, py); else roiCtx.lineTo(px, py);
+  });
+  roiCtx.closePath();
+  roiCtx.setLineDash(dash);
+  roiCtx.strokeStyle = color;
+  roiCtx.lineWidth = 2;
+  roiCtx.stroke();
+  roiCtx.setLineDash([]);
+}
+
+function drawLabel(text, x, y, color) {
+  roiCtx.font = "600 13px system-ui, sans-serif";
+  const width = roiCtx.measureText(text).width + 8;
+  roiCtx.fillStyle = color;
+  roiCtx.fillRect(x, y, width, 18);
+  roiCtx.fillStyle = "#fff";
+  roiCtx.fillText(text, x + 4, y + 13);
+}
+
+function renderRegions() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = roiCanvas.clientWidth, h = roiCanvas.clientHeight;
+  roiCanvas.width = Math.round(w * dpr);
+  roiCanvas.height = Math.round(h * dpr);
+  roiCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  roiCtx.clearRect(0, 0, w, h);
+  if (!roiState.image) return;
+
+  const img = roiState.image;
+  const t = roiTransform();
+  roiCtx.drawImage(img, t.offsetX, t.offsetY, img.naturalWidth * t.scale, img.naturalHeight * t.scale);
+
+  for (const spot of roiState.spots) drawPolygon(spot.corners, t, "#9ca3af", [4, 4]);
+  roiState.regions.forEach((region, i) => {
+    const color = ROI_COLORS[i % ROI_COLORS.length];
+    drawPolygon(region.corners, t, color, []);
+    const [x, y] = region.corners[0];
+    drawLabel(region.name, t.offsetX + x * t.scale, t.offsetY + y * t.scale, color);
+  });
+  if (roiState.drag) drawPolygon(rectCorners(roiState.drag), t, "#ffffff", [6, 4]);
+  if (roiState.points.length) {
+    // Pending corners of an angled region: dots plus the edges drawn so far
+    roiCtx.beginPath();
+    roiState.points.forEach(([x, y], i) => {
+      const px = t.offsetX + x * t.scale;
+      const py = t.offsetY + y * t.scale;
+      if (i === 0) roiCtx.moveTo(px, py); else roiCtx.lineTo(px, py);
+    });
+    roiCtx.strokeStyle = "#ffffff";
+    roiCtx.lineWidth = 2;
+    roiCtx.setLineDash([6, 4]);
+    roiCtx.stroke();
+    roiCtx.setLineDash([]);
+    for (const [x, y] of roiState.points) {
+      roiCtx.beginPath();
+      roiCtx.arc(t.offsetX + x * t.scale, t.offsetY + y * t.scale, 5, 0, Math.PI * 2);
+      roiCtx.fillStyle = "#ffffff";
+      roiCtx.fill();
+    }
+  }
+}
+
+function renderRegionList() {
+  const list = $("#roi-list");
+  list.replaceChildren();
+  roiState.regions.forEach((region, i) => {
+    const item = document.createElement("li");
+    const name = document.createElement("input");
+    name.value = region.name;
+    name.addEventListener("input", () => { region.name = name.value; renderRegions(); });
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "×";
+    remove.title = "Delete region";
+    remove.addEventListener("click", () => {
+      roiState.regions.splice(i, 1);
+      renderRegionList();
+      renderRegions();
+      updateRoiControls();
+    });
+    item.append(name, remove);
+    list.append(item);
+  });
+}
+
+function updateRoiControls() {
+  $("#roi-save-btn").disabled = !(roiState.camera && roiState.image);
+  $("#roi-message").textContent = roiState.image ? "" : "Load a camera, then choose an image.";
+}
+
+async function loadCamera() {
+  const id = $("#cam-input").value.trim();
+  if (!id) return;
+  try {
+    const cam = await api(`/api/cameras/${encodeURIComponent(id)}`);
+    roiState.camera = id;
+    roiState.cameraImageSize = cam.image_size;
+    roiState.spots = cam.spots;
+    roiState.regions = cam.rois.map((r) => ({ name: r.name, corners: r.corners }));
+    renderRegionList();
+    renderRegions();
+    updateRoiControls();
+    setRoiStatus(cam.exists
+      ? `Loaded ${cam.spots.length} spot(s) and ${cam.rois.length} region(s).`
+      : "New camera. Saving will create its config file.");
+  } catch (err) {
+    setRoiStatus(err.message, true);
+  }
+}
+
+function useSelectedImage() {
+  if (!state.selected) {
+    setRoiStatus("Select an image in Predict first.", true);
+    return;
+  }
+  const path = imagePath();
+  const img = new Image();
+  img.onload = () => {
+    roiState.image = img;
+    const size = [img.naturalWidth, img.naturalHeight];
+    $("#cam-image").textContent = `${state.selected} (${size[0]}×${size[1]})`;
+    if (roiState.cameraImageSize && roiState.cameraImageSize.join("x") !== size.join("x")) {
+      setRoiStatus(`Warning: the camera config is for ${roiState.cameraImageSize.join("×")}, not ${size.join("×")}.`, true);
+    }
+    renderRegions();
+    updateRoiControls();
+  };
+  img.onerror = () => setRoiStatus(`Could not load ${state.selected}.`, true);
+  img.src = `/api/image?path=${encodeURIComponent(path)}`;
+}
+
+async function saveRegions() {
+  const img = roiState.image;
+  const rois = roiState.regions.map((r, i) => ({
+    name: r.name.trim() || `region-${i + 1}`,
+    corners: r.corners.map(([x, y]) => [Math.round(x), Math.round(y)]),
+  }));
+  try {
+    const res = await api(`/api/cameras/${encodeURIComponent(roiState.camera)}/rois`, {
+      method: "PUT",
+      body: { image_size: [img.naturalWidth, img.naturalHeight], rois },
+    });
+    setRoiStatus(`Saved ${res.rois.length} region(s) to ${res.camera_id}.`);
+  } catch (err) {
+    setRoiStatus(`Not saved: ${err.message}`, true);
+  }
+}
+
+roiCanvas.addEventListener("pointerdown", (event) => {
+  if (!roiState.image) return;
+  const [x, y] = roiPoint(event);
+  roiState.drag = { x1: x, y1: y, x2: x, y2: y };
+  roiCanvas.setPointerCapture(event.pointerId);
+  renderRegions();
+});
+
+roiCanvas.addEventListener("pointermove", (event) => {
+  if (!roiState.drag) return;
+  const [x, y] = roiPoint(event);
+  Object.assign(roiState.drag, { x2: x, y2: y });
+  renderRegions();
+});
+
+roiCanvas.addEventListener("pointerup", () => {
+  const drag = roiState.drag;
+  roiState.drag = null;
+  if (drag && Math.abs(drag.x2 - drag.x1) >= 5 && Math.abs(drag.y2 - drag.y1) >= 5) {
+    // A drag makes an axis-aligned rectangle
+    roiState.points = [];
+    addRegion(rectCorners(drag));
+  } else if (drag) {
+    // A click adds one corner. The fourth corner completes an angled region.
+    roiState.points.push([drag.x1, drag.y1]);
+    if (roiState.points.length === 4) {
+      const corners = roiState.points;
+      roiState.points = [];
+      addRegion(corners);
+    } else {
+      setRoiStatus(`${roiState.points.length} of 4 corners. Esc cancels.`);
+    }
+  }
+  renderRegions();
+  updateRoiControls();
+});
+
+// Adds a region if its corners form a convex shape. The server rejects other shapes.
+function addRegion(corners) {
+  if (!isConvexQuad(corners)) {
+    setRoiStatus("Those corners don't form a convex shape. Click the four corners in order around the spot.", true);
+    return false;
+  }
+  roiState.regions.push({ name: `region ${roiState.regions.length + 1}`, corners });
+  renderRegionList();
+  setRoiStatus("");
+  return true;
+}
+
+// True when all turns of the quadrilateral go the same way (no crossed or flat corners)
+function isConvexQuad(c) {
+  let sign = 0;
+  for (let i = 0; i < 4; i++) {
+    const [a, b, d] = [c[i], c[(i + 1) % 4], c[(i + 2) % 4]];
+    const cross = (b[0] - a[0]) * (d[1] - b[1]) - (b[1] - a[1]) * (d[0] - b[0]);
+    if (Math.abs(cross) < 1e-9) return false;
+    const s = Math.sign(cross);
+    if (sign === 0) sign = s;
+    else if (s !== sign) return false;
+  }
+  return true;
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && roiState.points.length) {
+    roiState.points = [];
+    setRoiStatus("");
+    renderRegions();
+  }
+});
+
+$("#cam-load-btn").addEventListener("click", loadCamera);
+$("#cam-input").addEventListener("keydown", (event) => { if (event.key === "Enter") loadCamera(); });
+$("#use-image-btn").addEventListener("click", useSelectedImage);
+$("#roi-clear-btn").addEventListener("click", () => {
+  roiState.regions = [];
+  roiState.points = [];
+  renderRegionList();
+  renderRegions();
+  updateRoiControls();
+});
+$("#roi-save-btn").addEventListener("click", saveRegions);
+new ResizeObserver(renderRegions).observe(roiCanvas);
+
 // Applies carriage returns so tqdm progress bars update in place instead of repeating
 function cleanLog(text) {
   return text.split("\n").map((line) => {

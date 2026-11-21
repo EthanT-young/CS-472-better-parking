@@ -13,6 +13,10 @@ API:
                   returns {"count", "width", "height", "detections": [...]}
                   each detection has bbox [x1, y1, x2, y2], center, confidence, class_id, class_name
                   (pixel coordinates in the uploaded image)
+                  with camera_id=<id> (e.g. ?camera_id=garage-1) the response also has camera_id,
+                  spots_total, occupied, free and spots (one per spot in ml/cameras/<id>.json).
+                  count is still every vehicle in the frame. vehicles_in_rois is the number inside the
+                  camera's regions of interest, and only those vehicles decide which spots are occupied.
 
 """
 
@@ -25,6 +29,7 @@ import cv2
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 
+from camera_config import CameraConfigError, check_image_size, load_camera, spot_status, vehicles_in_rois
 from predict import ParkingDetector
 
 MODEL_PATH = os.environ.get("PARKING_MODEL", "models/parking_detector.pt")
@@ -68,6 +73,7 @@ def predict(
     image: UploadFile = File(...),
     conf: float = Query(0.5, ge=0, le=1),
     classes: list[int] | None = Query(None, description="Class IDs to detect. Default: 2 3 5 7"),
+    camera_id: str | None = Query(None, description="Camera whose spots to check (ml/cameras/<id>.json)"),
 ):
     data = image.file.read(MAX_UPLOAD_BYTES + 1)
     if len(data) > MAX_UPLOAD_BYTES:
@@ -76,17 +82,43 @@ def predict(
     if img is None:
         raise HTTPException(400, "Could not decode image")
 
+    height, width = img.shape[:2]
+    camera = None
+    if camera_id is not None:
+        try:
+            camera = load_camera(camera_id)
+            check_image_size(camera, width, height)
+        except FileNotFoundError as error:
+            raise HTTPException(404, str(error))
+        except ValueError as error:
+            raise HTTPException(400, str(error))
+        except CameraConfigError as error:
+            raise HTTPException(500, str(error))
+
     start = time.perf_counter()
     with _lock:
         detections = detector.get_detections(img, min_confidence=conf, classes=classes)
-    height, width = img.shape[:2]
-    return {
+    response = {
         "count": len(detections),
         "width": width,
         "height": height,
         "inference_ms": round((time.perf_counter() - start) * 1000, 1),
         "detections": detections,
     }
+
+    if camera is not None:
+        in_rois = vehicles_in_rois(camera, detections)
+        spots = spot_status(camera, in_rois)
+        occupied = sum(1 for spot in spots if spot["occupied"])
+        response.update({
+            "camera_id": camera_id,
+            "vehicles_in_rois": len(in_rois),
+            "spots_total": len(spots),
+            "occupied": occupied,
+            "free": len(spots) - occupied,
+            "spots": spots,
+        })
+    return response
 
 
 if __name__ == "__main__":

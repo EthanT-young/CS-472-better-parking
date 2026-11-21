@@ -13,6 +13,7 @@
       <button class="tab active" data-view="predict">Predict</button>
       <button class="tab" data-view="train">Train</button>
       <button class="tab" data-view="test">Test</button>
+      <button class="tab" data-view="regions">Regions</button>
     </nav>
   </header>
 
@@ -97,6 +98,34 @@
       </div>
     </form>
     <pre class="log"></pre>
+  </section>
+
+  <!-- Regions of interest -->
+  <section id="view-regions" class="view regions">
+    <aside class="sidebar">
+      <label class="field">Camera ID
+        <input id="cam-input" spellcheck="false" placeholder="garage-1">
+      </label>
+      <button id="cam-load-btn" type="button">Load camera</button>
+      <button id="use-image-btn" type="button">Use image selected in Predict</button>
+      <div id="cam-image" class="muted">No image loaded</div>
+      <ul id="roi-list" class="roi-list"></ul>
+      <div id="roi-status" class="muted"></div>
+    </aside>
+
+    <main class="predict-main">
+      <div class="toolbar">
+        <span class="muted">Drag for a rectangle, or click four corners for an angled region (Esc cancels). Regions limit which vehicles count.</span>
+        <div class="actions">
+          <button id="roi-clear-btn" type="button">Clear regions</button>
+          <button id="roi-save-btn" class="primary" disabled>Save regions</button>
+        </div>
+      </div>
+      <div id="roi-stage" class="stage">
+        <canvas id="roi-canvas"></canvas>
+        <div id="roi-message" class="stage-message">Load a camera, then choose an image.</div>
+      </div>
+    </main>
   </section>
 
   <script src="app.js"></script>

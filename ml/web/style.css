@@ -187,3 +187,11 @@ nav { display: flex; }
   color: var(--log-text);
   font: 12px/1.45 ui-monospace, "Cascadia Mono", monospace;
 }
+
+/* Regions of interest */
+.regions .sidebar button { margin-top: 8px; }
+.roi-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.roi-list li { display: flex; gap: 4px; align-items: center; }
+.roi-list input { flex: 1; min-width: 0; font-size: 13px; }
+.roi-list button { padding: 4px 8px; }
+#roi-canvas { cursor: crosshair; }

@@ -9,6 +9,8 @@ Serves the frontend in web/ and a small JSON API:
   GET  /api/image          serve an image file
   GET  /api/models         list available .pt weights
   POST /api/predict        run the detector on an image, returns detections as JSON
+  GET  /api/cameras/{id}   a camera's spots and regions of interest (ROIs)
+  PUT  /api/cameras/{id}/rois  replace a camera's ROIs (keeps its spots)
   POST /api/jobs/{name}    start train.py / test.py
   GET  /api/jobs/{name}    poll a job's status and log output
   POST /api/jobs/{name}/stop
@@ -107,6 +109,44 @@ def predict(req: PredictRequest):
         detections = detector.get_detections(str(image_path), min_confidence=req.conf, classes=req.classes)
 
     return {"detections": detections, "count": len(detections)}
+
+
+# --- Camera regions (ROIs) ---
+
+class RoisRequest(BaseModel):
+    image_size: list[int]  # [width, height] of the image the regions were drawn on
+    rois: list[dict]       # [{"name": str, "corners": [[x, y] x 4]}]
+
+
+@app.get("/api/cameras/{camera_id}")
+def get_camera(camera_id: str):
+    from camera_config import CameraConfigError, read_raw  # local: keeps gui.py start-up light
+
+    try:
+        raw = read_raw(camera_id)
+    except ValueError as error:
+        raise HTTPException(400, str(error))
+    except CameraConfigError as error:
+        raise HTTPException(500, str(error))
+    if raw is None:
+        return {"camera_id": camera_id, "exists": False, "image_size": None, "spots": [], "rois": []}
+    return {"camera_id": camera_id, "exists": True, **{k: raw.get(k, d) for k, d in
+            (("image_size", None), ("spots", []), ("rois", []))}}
+
+
+@app.put("/api/cameras/{camera_id}/rois")
+def put_rois(camera_id: str, req: RoisRequest):
+    from camera_config import CameraConfigError, save_rois
+
+    if len(req.image_size) != 2:
+        raise HTTPException(400, "image_size must be [width, height]")
+    try:
+        camera = save_rois(camera_id, req.image_size, req.rois)
+    except (ValueError, KeyError, TypeError) as error:
+        raise HTTPException(400, f"Invalid regions: {error}")
+    except CameraConfigError as error:
+        raise HTTPException(500, str(error))
+    return {"camera_id": camera_id, "rois": [r["name"] for r in camera["rois"]]}
 
 
 # --- Training / testing jobs ---
