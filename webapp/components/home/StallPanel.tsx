@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -54,9 +55,10 @@ function Legend({ highContrast }: { highContrast: boolean }) {
   );
 }
 
-// The map's stalls are mouse/touch targets only, so the same choices are offered here as
-// buttons. That covers keyboard use (WCAG 2.1.1) and the tiny map targets (2.5.8).
-function OpenStallList({
+// Provides a complete HTML alternative to the interactive Leaflet map.
+// Users can inspect and select every parking stall using keyboard controls.
+// Supports WCAG 1.1.1, 1.3.1, 2.1.1, and 4.1.2.
+function AllStallList({
   level,
   stalls,
   permit,
@@ -71,9 +73,9 @@ function OpenStallList({
 }) {
   const rows = new Map<string, Stall[]>();
   for (const stall of level.stalls ?? []) {
-    if (stalls[stall.id] !== "open" || !canPark(permit, stall.type)) continue;
     rows.set(stall.strip, [...(rows.get(stall.strip) ?? []), stall]);
   }
+
   const sorted = [...rows.entries()].sort(([a], [b]) =>
     a.localeCompare(b, undefined, { numeric: true })
   );
@@ -81,12 +83,17 @@ function OpenStallList({
 
   return (
     <details className="mt-3 rounded-xl border border-slate-300 bg-white">
-      <summary className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold text-slate-900">
-        List open stalls you can use ({count})
+      <summary
+        id={`stall-list-${level.id}`}
+        className="flex min-h-11 cursor-pointer items-center rounded-xl px-3 text-sm font-semibold text-slate-900"
+      >
+        Browse all stalls ({count})
       </summary>
 
       {count === 0 ? (
-        <p className="px-3 pb-3 text-sm text-slate-600">None on this level right now.</p>
+        <p className="px-3 pb-3 text-sm text-slate-600">
+          No parking stalls are mapped for this level.
+        </p>
       ) : (
         <div className="max-h-72 space-y-3 overflow-y-auto px-3 pb-3">
           {sorted.map(([strip, row]) => (
@@ -106,9 +113,14 @@ function OpenStallList({
                     aria-pressed={stall.id === selectedId}
                     className="min-h-8 min-w-8 rounded-md border border-slate-500 px-2 text-xs font-semibold text-slate-900 hover:bg-slate-100 aria-pressed:border-slate-900 aria-pressed:bg-slate-900 aria-pressed:text-white"
                   >
-                    {stall.id}
-                    {stall.type !== "Student" && (
-                      <span className="font-normal"> · {stall.type}</span>
+                    Stall {stall.id} · {stall.type} ·{" "}
+                    {stalls[stall.id] === "open"
+                      ? "Open"
+                      : stalls[stall.id] === "taken"
+                        ? "Taken"
+                        : "Status unavailable"}
+                    {!canPark(permit, stall.type) && (
+                      <span> · Outside selected parking filter</span>
                     )}
                   </button>
                 ))}
@@ -160,9 +172,24 @@ export default function StallPanel({
   permit,
   highContrast,
 }: StallPanelProps) {
-  const [selected, setSelected] = useState<Stall | null>(null);
+  const [selected, setSelected] = useState<{
+    garageId: string;
+    levelId: string;
+    stallId: string;
+  } | null>(null);
+
   const selectedHere =
-    selected && level.stalls?.some((stall) => stall.id === selected.id) ? selected : null;
+    selected?.garageId === garage.id && selected?.levelId === level.id
+      ? level.stalls?.find((stall) => stall.id === selected.stallId) ?? null
+      : null;
+
+  function handleSelectStall(stall: Stall) {
+    setSelected({
+      garageId: garage.id,
+      levelId: level.id,
+      stallId: stall.id,
+    });
+  }
 
   if (!level.stalls || !garage.viewBox) {
     return (
@@ -193,9 +220,19 @@ export default function StallPanel({
             {hint.rows.join(", ")}): <span className="font-bold">{hint.open} open</span> for you.
           </>
         ) : (
-          <>No open {permit === "all" ? "" : `${permitLabels[permit].toLowerCase()} `}spots on this level.</>
+          <>
+            No open {permit === "all" ? "" : `${permitLabels[permit].toLowerCase()} `}
+            spots on this level.
+          </>
         )}
       </p>
+
+      <a
+        href={`#stall-list-${level.id}`}
+        className="mt-3 inline-block self-start rounded-lg px-3 py-2 text-sm font-semibold text-blue-700 underline focus-visible:outline-2"
+      >
+        Skip interactive map and browse stalls as a list
+      </a>
 
       <div
         className={`mt-3 h-[440px] overflow-hidden rounded-xl border border-slate-200 sm:h-[560px] lg:h-[640px] ${
@@ -210,37 +247,46 @@ export default function StallPanel({
           permit={permit}
           highContrast={highContrast}
           selectedStallId={selectedHere?.id ?? null}
-          onSelectStall={setSelected}
+          onSelectStall={handleSelectStall}
         />
       </div>
 
-      <div className="mt-3 min-h-14 rounded-xl bg-slate-50 px-3 py-2 text-sm" aria-live="polite">
+      <div
+        className="mt-3 min-h-14 rounded-xl bg-slate-50 px-3 py-2 text-sm"
+        aria-live="polite"
+      >
         {selectedHere ? (
           <p>
             <span className="font-bold">Stall {selectedHere.id}</span> · {selectedHere.type} ·{" "}
             <span className="font-semibold">
-              {stalls[selectedHere.id] === "open" ? "Open" : "Taken"}
+              {stalls[selectedHere.id] === "open"
+                ? "Open"
+                : stalls[selectedHere.id] === "taken"
+                  ? "Taken"
+                  : "Status unavailable"}
             </span>
             <br />
             <span className="text-slate-600">
               {canPark(permit, selectedHere.type)
-                ? "You can park here."
-                : `Not available with a ${permitLabels[permit]} permit.`}
+                ? "This stall is included in your parking filter."
+                : `Not included with the ${permitLabels[permit]} parking filter.`}
             </span>
           </p>
         ) : (
           <p className="text-slate-600">
-            Tap a stall on the map, or pick one from the list below, to see its type and status.
+            Select a stall on the map or choose one from the list below
+            to view its type and occupancy status.
+            Keyboard users can press Enter or Space to select a stall.
           </p>
         )}
       </div>
 
-      <OpenStallList
+      <AllStallList
         level={level}
         stalls={stalls}
         permit={permit}
         selectedId={selectedHere?.id ?? null}
-        onSelect={setSelected}
+        onSelect={handleSelectStall}
       />
     </section>
   );

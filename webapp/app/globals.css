@@ -148,3 +148,18 @@ body {
 .high-contrast .border-slate-200 {
   border-color: #000;
 }
+
+/* Accessible keyboard focus for parking polygons */
+.stall-map .leaflet-interactive[role="button"]:focus-visible {
+  outline: 3px solid #1447e6;
+  outline-offset: 2px;
+  stroke: #1447e6;
+  stroke-width: 4px;
+}
+
+/* High-contrast keyboard focus */
+.stall-map-hc .leaflet-interactive[role="button"]:focus-visible {
+  outline-color: #000000;
+  stroke: #000000;
+  stroke-width: 4px;
+}
