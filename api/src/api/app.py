@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from api.db import get_db
 from supabase import Client
 from pydantic import BaseModel  
 from api.config import settings
 from api.auth import require_device
+import httpx
+from api.ml import predict_spots
 
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
@@ -80,4 +82,20 @@ def update_spots(spots: list[SpotStatus], db: Client = Depends(get_db),
 
     return result
 
+@app.post("/camera/{camera_id}/predict")
+async def predict(camera_id: str, image: UploadFile = File(...),
+                  device_id: str = Depends(require_device)):
+    data = await image.read()
+    try:
+        result = await predict_spots(camera_id, data, image.filename)
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+    except httpx.HTTPStatusError as error:
+        status = error.response.status_code
+        if status in (400, 404, 413):
+            raise HTTPException(status_code=status, detail=error.response.text)
+        raise HTTPException(status_code=502, detail="ML server error")
+    except httpx.RequestError:
+        raise HTTPException(status_code=502, detail="ML server unreachable")
+    return result
 
