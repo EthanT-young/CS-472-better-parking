@@ -32,7 +32,7 @@ python serve.py --host 0.0.0.0 --port 8001 --model models/parking_detector.pt   
 ```
 
 - `GET /health` returns the loaded model, the device it runs on (`cuda:0`, `mps` or `cpu`) and the class names. Use it to check the service is up.
-- `POST /predict` takes the image as a multipart upload in an `image` field. Optional query parameters: `conf` (default `0.5`) and `classes`, repeated for each class ID (default cars, motorcycles, buses and trucks).
+- `POST /predict` takes the image as a multipart upload in an `image` field. Optional query parameters: `conf` (default `0.5`), `classes`, repeated for each class ID (default cars, motorcycles, buses and trucks), and `camera_id`. With `camera_id`, the response covers that camera's regions and spots (see below).
 
 ```bash
 curl -F image=@snapshot.jpg "http://127.0.0.1:8001/predict?conf=0.5&classes=2&classes=7"
@@ -48,6 +48,41 @@ curl -F image=@snapshot.jpg "http://127.0.0.1:8001/predict?conf=0.5&classes=2&cl
 ```
 
 `bbox` and `center` are pixel coordinates in the uploaded image. Unreadable images return `400`, and images over 20 MB return `413`.
+
+### Cameras, regions, and spots
+
+Each camera has a file at `ml/cameras/<camera_id>.json`. The GUI's Regions tab writes it, and you can also edit it by hand. It holds:
+
+- `image_size`: the `[width, height]` the layout was drawn on. A snapshot of any other size is rejected with `400`.
+- `rois`: optional regions. A vehicle counts only when the middle of its bottom edge is inside a region. With no regions, every vehicle counts.
+- `spots`: one four-corner polygon per parking stall. Each spot has an `id`, which should match the stall's ID in the database.
+- `occupied_overlap`: how much of a stall a vehicle has to cover before the stall counts as occupied. The default is `0.3`.
+
+Corners are pixel coordinates in an image of exactly `image_size`. Every polygon must be convex and inside the frame, and spot IDs must be unique.
+
+With a `camera_id`, the service returns the count and the spot status, and no detection list:
+
+```bash
+curl -F image=@snapshot.jpg "http://127.0.0.1:8001/predict?camera_id=tmc-lot"
+```
+
+```json
+{
+  "count": 6, "camera_id": "tmc-lot", "inference_ms": 219.2,
+  "occupied": 6, "free": 2, "unknown": 0,
+  "spots": [
+    {"spot_id": 1, "occupied": true,  "overlap": 0.992},
+    {"spot_id": 2, "occupied": false, "overlap": 0.265}
+  ]
+}
+```
+
+- `count` is the number of vehicles inside the camera's regions.
+- A spot is occupied when a vehicle covers at least `occupied_overlap` of it.
+- `occupied` is `null` for a spot outside every region. That spot is unknown, not free, so it isn't counted in `free`.
+- `overlap` is the largest share of the spot covered by one vehicle. Use it to see how close a spot was to the threshold.
+
+Regions and spots are drawn in the Regions tab. Use **Regions** or **Spots** to choose what a drag or click adds. A drag makes a rectangle, and four clicks make an angled shape.
 
 From the backend, send the snapshot bytes directly; there's no need to save them to a file first:
 
@@ -72,6 +107,7 @@ python gui.py          # then open http://127.0.0.1:8000
 - **Predict**: type or browse to a folder in the sidebar, then click an image (or use the arrow keys) to run the model on it. Detections are drawn over the image. Change the model, confidence, and vehicle classes in the toolbar. The confidence slider and class checkboxes filter the results instantly without rerunning the model, and results are remembered when you revisit an image. Click *Run* to force a fresh run. *Save annotated* downloads the image with its boxes.
 - **Train**: same options as `train.py`. Output streams into the log, and *Stop* cancels the run.
 - **Test**: runs `test.py` against a dataset split and shows the mAP results in the log.
+- **Regions**: load a camera by ID, pick an image from the Predict tab, and draw its regions and spots. Save each one separately. The Predict tab has a *Camera* field, and when it's filled in, the result line shows the count and the spot status.
 
 Use `--port` to change the port. On WSL, open the URL in your Windows browser as usual. Use `--host 0.0.0.0` only on a trusted network, because the GUI can browse folders on this machine.
 
@@ -264,6 +300,41 @@ for section, spots in [("section_a.jpg", 20), ("section_b.jpg", 35)]:
 
 
 ```
+
+## Spot classifier (PKLot)
+
+For elevated camera views, we train a classifier that decides whether each parking space is occupied or empty. The training data is the PKLot dataset (UFPR04 and UFPR05). Two scripts do the work:
+
+```bash
+# Cut every space out of the full PKLot images into labelled crops
+python prepare_pklot.py --src datasets/pklot/raw
+
+# Train on the crops (one model at a time)
+python train_pklot_cls.py --model yolo11l-cls.pt --epochs 10 --imgsz 128
+
+# Train on one lot and test on the other
+python train_pklot_cls.py --model yolo11l-cls.pt --train-subset UFPR04 --test-subset UFPR05
+```
+
+Crops are split by day, so the same day never appears in both training and testing. Each run writes `metrics.json` (accuracy, F1, and the confusion matrix, overall and per lot and weather) into `runs/cls/`.
+
+Test accuracy at 128-pixel crops and 10 epochs:
+
+| Model | Mixed split (both lots) | Trained on UFPR04, tested on UFPR05 | Trained on UFPR05, tested on UFPR04 |
+|---|---|---|---|
+| YOLO11l-cls | 99.90% | 99.44% | 98.64% |
+| YOLO11m-cls | 99.91% | 99.31% | 94.68% |
+| ResNet-18 | 99.87% | 98.46% | 86.28% |
+
+The mixed split is the easiest case, since the test days come from lots the model has already seen. The cross-lot columns are a better guide to how a model will do on a new camera. YOLO11l-cls was the most accurate in both cross-lot directions, so it's the model to use for deployment. The model weights are git-ignored, so they're shared separately (for example, as a release asset).
+
+### Dataset credit and terms
+
+The PKLot dataset is by Paulo Almeida, Luiz S. Oliveira, Eunelson Silva Jr., Alceu Britto Jr., and Alessandro Koerich. The authors allow it to be used for any kind of research, provided the source is acknowledged by citing this paper:
+
+> Almeida, P., Oliveira, L. S., Silva Jr, E., Britto Jr, A., Koerich, A., PKLot – A robust dataset for parking lot classification, Expert Systems with Applications, 42(11):4937-4949, 2015.
+
+The dataset itself is obtained on request from the [UFPR parking-lot database page](http://web.inf.ufpr.br/vri/parking-lot-database). The terms above don't address commercial use, so check with the authors before using the crops or the trained models commercially.
 
 ## Troubleshooting
 
