@@ -6,6 +6,7 @@ from api.config import settings
 from api.auth import require_device
 import httpx
 from api.ml import predict_spots
+from fastapi.concurrency import run_in_threadpool
 
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
@@ -99,3 +100,11 @@ async def predict(camera_id: str, image: UploadFile = File(...),
         raise HTTPException(status_code=502, detail="ML server unreachable")
     return result
 
+def save_spaces(db: Client, spots: list[dict]) -> None:
+    occupied = [s for s in spots if s["occupied"]]
+    empty = [s for s in spots if not s["occupied"]]
+
+    if occupied:
+        db.table("spots").update({"taken": True}).in_("spot_id", [s["spot_id"] for s in occupied]).execute()
+    if empty:
+        db.table("spots").update({"taken": False}).in_("spot_id", [s["spot_id"] for s in empty]).execute()
