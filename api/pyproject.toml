@@ -7,11 +7,13 @@ authors = [
     { name = "ethan-zhou-unlv", email = "zhoue2@unlv.nevada.edu" },
     { name = "Jacob Minnich", email = "minnij1@unlv.nevada.edu" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.128.8",
+    "httpx>=0.28.1",
     "pydantic-settings>=2.11.0",
     "python-dotenv>=1.2.1",
+    "python-multipart>=0.0.32",
     "supabase>=2.32.0",
 ]
 
